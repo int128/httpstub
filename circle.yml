@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8
+    working_directory: ~/gradle-starter
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v2-dependencies-{{ checksum "build.gradle" }}
+          - v2-dependencies-
+
+      - run:
+          name: Build
+          command: |
+            ./gradlew build
+
+      - store_test_results:
+          path: build/test-results/test
+
+      - save_cache:
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+          key: v2-dependencies-{{ checksum "build.gradle" }}
+
+      - deploy:
+          name: Publish
+          command: |
+            if [ "$CIRCLE_TAG" ]; then
+              ./gradlew bintrayUpload -PbintrayUser="$BINTRAY_USER"
+            fi
+
+deployment:
+  publish:
+    tag: /.*/
