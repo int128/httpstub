@@ -7,12 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.File;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,22 +28,10 @@ public class StubConfiguration {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val method = StubRequestController.class.getMethod("handle");
+        val method = StubRequestController.class.getMethod("handle", MultiValueMap.class, Map.class);
 
         ruleYamlLoader.walk(new File(path)).forEach(rule -> {
-            mapping.registerMapping(
-                    new RequestMappingInfo(
-                            new PatternsRequestCondition(rule.getPath()),
-                            new RequestMethodsRequestCondition(rule.getMethod()),
-                            null,
-                            null,
-                            null,
-                            null,
-                            null
-                    ),
-                    new StubRequestController(rule),
-                    method
-            );
+            mapping.registerMapping(rule.getRequestMappingInfo(), new StubRequestController(rule), method);
         });
 
         return mapping;
