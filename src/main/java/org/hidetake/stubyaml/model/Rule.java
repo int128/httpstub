@@ -3,10 +3,11 @@ package org.hidetake.stubyaml.model;
 import lombok.Data;
 
 @Data
-public class RequestRule {
+public class Rule {
     private final String path;
     private final String method;
 
-    public static RequestRule fromFilename(String filename) {
+    public static Rule fromFilename(String filename) {
+        return null;
     }
 }

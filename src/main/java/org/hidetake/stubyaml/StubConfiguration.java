@@ -1,27 +1,32 @@
 package org.hidetake.stubyaml;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hidetake.stubyaml.model.RequestRule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
 
+import java.io.File;
 import java.util.HashMap;
 
 @Configuration
+@RequiredArgsConstructor
+@Slf4j
 public class StubConfiguration {
     @Getter
     @Setter
     private String path = "data";
 
+    private final RuleYamlProcessor ruleYamlProcessor;
+
     @Bean
     SimpleUrlHandlerMapping stubRequestHandlerMapping() {
         val map = new HashMap<String, Object>();
-        new FileWalker(path).walk().forEach(file -> {
-            val rule = RequestRule.fromFilename(file.getName());
-            map.put(file.getName(), new StubRequestHandler(file));
+        ruleYamlProcessor.walk(new File(path)).forEach(rule -> {
+            log.debug("rule={}", rule);
         });
 
         val mapping = new SimpleUrlHandlerMapping();
