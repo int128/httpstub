@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.File;
@@ -29,7 +28,7 @@ public class StubConfiguration {
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
         val method = StubRequestController.class.getMethod(
-            "handle", MultiValueMap.class, Map.class);
+            "handle", Map.class, Map.class);
 
         ruleYamlLoader.walk(new File(path))
             .forEach(rule -> {
