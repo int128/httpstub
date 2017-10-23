@@ -3,6 +3,12 @@ response:
     content-type: application/json
   body: |
     [
-      {"id": 1, "name": "Foo"},
-      {"id": 2, "name": "Bar"}
+      {
+        "id": 1,
+        "name": "Foo"
+      },
+      {
+        "id": 2,
+        "name": "Bar"
+      }
     ]

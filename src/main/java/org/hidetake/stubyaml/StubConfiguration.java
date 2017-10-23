@@ -7,10 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.io.File;
-import java.util.HashMap;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,18 +22,31 @@ public class StubConfiguration {
     @Setter
     private String path = "data";
 
-    private final RuleYamlProcessor ruleYamlProcessor;
+    private final RuleYamlLoader ruleYamlLoader;
 
     @Bean
-    SimpleUrlHandlerMapping stubRequestHandlerMapping() {
-        val map = new HashMap<String, Object>();
-        ruleYamlProcessor.walk(new File(path)).forEach(rule -> {
-            log.debug("rule={}", rule);
+    RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException {
+        val mapping = new RequestMappingHandlerMapping();
+        mapping.setOrder(Integer.MAX_VALUE - 2);
+
+        val method = StubRequestController.class.getMethod("handle");
+
+        ruleYamlLoader.walk(new File(path)).forEach(rule -> {
+            mapping.registerMapping(
+                    new RequestMappingInfo(
+                            new PatternsRequestCondition(rule.getPath()),
+                            new RequestMethodsRequestCondition(rule.getMethod()),
+                            null,
+                            null,
+                            null,
+                            null,
+                            null
+                    ),
+                    new StubRequestController(rule),
+                    method
+            );
         });
 
-        val mapping = new SimpleUrlHandlerMapping();
-        mapping.setOrder(Integer.MAX_VALUE - 2);
-        mapping.setUrlMap(map);
         return mapping;
     }
 }
