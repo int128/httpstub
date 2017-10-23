@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
   compile 'org.yaml:snakeyaml:1.19'
+  compile 'commons-io:commons-io:2.5'
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-jetty'
   compileOnly 'org.projectlombok:lombok:1.16.18'

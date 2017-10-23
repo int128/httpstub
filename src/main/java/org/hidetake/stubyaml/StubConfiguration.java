@@ -13,9 +13,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.io.File;
 import java.util.Map;
 
-@Configuration
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
+@Configuration
 public class StubConfiguration {
     @Getter
     @Setter
