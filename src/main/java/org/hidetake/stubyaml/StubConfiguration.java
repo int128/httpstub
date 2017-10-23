@@ -30,9 +30,10 @@ public class StubConfiguration {
 
         val method = StubRequestController.class.getMethod("handle", MultiValueMap.class, Map.class);
 
-        ruleYamlLoader.walk(new File(path)).forEach(rule -> {
-            mapping.registerMapping(rule.getRequestMappingInfo(), new StubRequestController(rule), method);
-        });
+        ruleYamlLoader.walk(new File(path))
+            .forEach(rule -> {
+                mapping.registerMapping(rule.getRequestMappingInfo(), new StubRequestController(rule), method);
+            });
 
         return mapping;
     }

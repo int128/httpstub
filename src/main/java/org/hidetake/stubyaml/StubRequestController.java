@@ -17,14 +17,14 @@ public class StubRequestController {
 
     @ResponseBody
     public String handle(
-            @RequestParam MultiValueMap<String, String> params,
-            @PathVariable Map<String, String> pathVariables
+        @RequestParam MultiValueMap<String, String> params,
+        @PathVariable Map<String, String> pathVariables
     ) throws Exception {
         return String.format(
-                "params=%s\npathVariables=%s\nyaml=%s",
-                params,
-                pathVariables,
-                rule.getYamlFile().getAbsolutePath()
+            "params=%s\npathVariables=%s\nyaml=%s",
+            params,
+            pathVariables,
+            rule.getYamlFile().getAbsolutePath()
         );
     }
 }

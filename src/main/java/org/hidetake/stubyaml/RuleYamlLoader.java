@@ -29,8 +29,8 @@ public class RuleYamlLoader {
         val basePath = baseDirectory.toPath();
         try {
             return Files.walk(basePath)
-                    .filter(path -> path.toFile().isFile())
-                    .map(path -> mapToRule(basePath.relativize(path), path.toFile()));
+                .filter(path -> path.toFile().isFile())
+                .map(path -> mapToRule(basePath.relativize(path), path.toFile()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,16 +44,16 @@ public class RuleYamlLoader {
             val extension = m.group(3);
             if ("yaml".equals(extension)) {
                 return new Rule(
-                        new RequestMappingInfo(
-                                new PatternsRequestCondition(realPath),
-                                new RequestMethodsRequestCondition(RequestMethod.valueOf(method)),
-                                null,
-                                null,
-                                null,
-                                null,
-                                null
-                        ),
-                        file
+                    new RequestMappingInfo(
+                        new PatternsRequestCondition(realPath),
+                        new RequestMethodsRequestCondition(RequestMethod.valueOf(method)),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ),
+                    file
                 );
             } else {
                 log.warn("Ignored file {}", path);

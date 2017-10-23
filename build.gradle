@@ -1,23 +1,23 @@
 plugins {
-    id 'groovy'
-    id 'org.springframework.boot' version '1.5.8.RELEASE'
+  id 'groovy'
+  id 'org.springframework.boot' version '1.5.8.RELEASE'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    jcenter()
+  jcenter()
 }
 
 dependencies {
-    compile 'org.yaml:snakeyaml:1.19'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-jetty'
-    compileOnly 'org.projectlombok:lombok:1.16.18'
+  compile 'org.yaml:snakeyaml:1.19'
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  compile 'org.springframework.boot:spring-boot-starter-jetty'
+  compileOnly 'org.projectlombok:lombok:1.16.18'
 
-    testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
-    testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
-    testRuntime 'cglib:cglib-nodep:3.2.5'
-    testRuntime 'org.objenesis:objenesis:2.6'
+  testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
+  testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+  testRuntime 'cglib:cglib-nodep:3.2.5'
+  testRuntime 'org.objenesis:objenesis:2.6'
 }
