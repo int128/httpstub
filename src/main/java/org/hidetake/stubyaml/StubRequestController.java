@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.Rule;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -34,25 +33,24 @@ public class StubRequestController {
             .findAny()
             .map(requestAndResponseRule -> {
                 val response = requestAndResponseRule.getResponse();
-                val responseBody = replacePlaceholders(response.getBody(), pathVariables, requestParams);
-                val responseHeaders = new HttpHeaders();
-                responseHeaders.putAll(response.getHttpHeaders());
-                responseHeaders.add("x-path-variables", pathVariables.toString());
-                responseHeaders.add("x-request-params", requestParams.toString());
-                responseHeaders.add("x-request-body", requestBody.toString());
-                return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.valueOf(response.getStatus()));
+                val responseBody =
+                    replacePlaceholders(
+                        replacePlaceholders(
+                            replacePlaceholders(response.getBody(),
+                                pathVariables), requestParams), requestBody);
+                return ResponseEntity
+                    .status(response.getStatus())
+                    .headers(response.getHttpHeaders())
+                    .header("x-path-variables", pathVariables.toString())
+                    .header("x-request-params", requestParams.toString())
+                    .header("x-request-body", requestBody.toString())
+                    .body(responseBody);
             })
             .orElse(NO_RULE_RESPONSE);
     }
 
-    private static String replacePlaceholders(
-        String value,
-        Map<String, String> pathVariables,
-        Map<String, String> params
-    ) {
+    private static String replacePlaceholders(String value, Map<String, String> map) {
         val helper = new PropertyPlaceholderHelper("${", "}");
-        return helper.replacePlaceholders(
-            helper.replacePlaceholders(value, params::get),
-            pathVariables::get);
+        return helper.replacePlaceholders(value, map::get);
     }
 }
