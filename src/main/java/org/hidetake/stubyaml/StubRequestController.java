@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,18 +26,18 @@ public class StubRequestController {
     @ResponseBody
     public ResponseEntity handle(
         @PathVariable Map<String, String> pathVariables,
-        @RequestParam Map<String, String> params
+        @RequestParam Map<String, String> params,
+        @RequestBody Object body
     ) throws Exception {
+        log.info("pathVariables={}, params={}, body={}", pathVariables, params, body);
+
         return Arrays.stream(rule.getRequestAndResponseRules())
-            .map(requestAndResponseRule -> {
-                return requestAndResponseRule;
-            })
             .findAny()
             .map(requestAndResponseRule -> {
                 val response = requestAndResponseRule.getResponse();
-                val body = replacePlaceholders(response.getBody(), pathVariables, params);
+                val responseBody = replacePlaceholders(response.getBody(), pathVariables, params);
                 return new ResponseEntity<>(
-                    body,
+                    responseBody,
                     response.getHttpHeaders(),
                     HttpStatus.valueOf(response.getStatus())
                 );

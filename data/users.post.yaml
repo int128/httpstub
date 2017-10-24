@@ -1,0 +1,8 @@
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      {
+        "id": ${userId},
+        "name": "User ${userId}"
+      }

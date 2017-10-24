@@ -27,12 +27,11 @@ public class StubConfiguration {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val method = StubRequestController.class.getMethod(
-            "handle", Map.class, Map.class);
+        val handle = StubRequestController.class.getMethod("handle", Map.class, Map.class, Object.class);
 
         ruleYamlLoader.walk(new File(path))
             .forEach(rule -> {
-                mapping.registerMapping(rule.toRequestMappingInfo(), new StubRequestController(rule), method);
+                mapping.registerMapping(rule.toRequestMappingInfo(), new StubRequestController(rule), handle);
             });
 
         return mapping;
