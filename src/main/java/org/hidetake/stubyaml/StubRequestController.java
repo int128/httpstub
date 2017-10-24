@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.Rule;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.PropertyPlaceholderHelper;
@@ -26,21 +27,20 @@ public class StubRequestController {
     @ResponseBody
     public ResponseEntity handle(
         @PathVariable Map<String, String> pathVariables,
-        @RequestParam Map<String, String> params,
-        @RequestBody Object body
+        @RequestParam Map<String, String> requestParams,
+        @RequestBody Map<String, String> requestBody
     ) throws Exception {
-        log.info("pathVariables={}, params={}, body={}", pathVariables, params, body);
-
         return Arrays.stream(rule.getRequestAndResponseRules())
             .findAny()
             .map(requestAndResponseRule -> {
                 val response = requestAndResponseRule.getResponse();
-                val responseBody = replacePlaceholders(response.getBody(), pathVariables, params);
-                return new ResponseEntity<>(
-                    responseBody,
-                    response.getHttpHeaders(),
-                    HttpStatus.valueOf(response.getStatus())
-                );
+                val responseBody = replacePlaceholders(response.getBody(), pathVariables, requestParams);
+                val responseHeaders = new HttpHeaders();
+                responseHeaders.putAll(response.getHttpHeaders());
+                responseHeaders.add("x-path-variables", pathVariables.toString());
+                responseHeaders.add("x-request-params", requestParams.toString());
+                responseHeaders.add("x-request-body", requestBody.toString());
+                return new ResponseEntity<>(responseBody, responseHeaders, HttpStatus.valueOf(response.getStatus()));
             })
             .orElse(NO_RULE_RESPONSE);
     }
