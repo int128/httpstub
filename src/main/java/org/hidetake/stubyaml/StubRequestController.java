@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,11 +35,8 @@ public class StubRequestController {
             .findAny()
             .map(requestAndResponseRule -> {
                 val response = requestAndResponseRule.getResponse();
-                val responseBody =
-                    replacePlaceholders(
-                        replacePlaceholders(
-                            replacePlaceholders(response.getBody(),
-                                pathVariables), requestParams), requestBody);
+                val responseBody = replacePlaceholders(response.getBody(),
+                    Arrays.asList(pathVariables, requestParams, requestBody));
                 return ResponseEntity
                     .status(response.getStatus())
                     .headers(response.getHttpHeaders())
@@ -49,8 +48,14 @@ public class StubRequestController {
             .orElse(NO_RULE_RESPONSE);
     }
 
-    private static String replacePlaceholders(String value, Map<String, String> map) {
+    private static String replacePlaceholders(String value, List<Map<String, String>> maps) {
         val helper = new PropertyPlaceholderHelper("${", "}");
-        return helper.replacePlaceholders(value, map::get);
+        return helper.replacePlaceholders(value, key ->
+            maps.stream()
+                .map(map -> map.get(key))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseGet(null)
+        );
     }
 }
