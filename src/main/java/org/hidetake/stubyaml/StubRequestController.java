@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static org.springframework.util.ObjectUtils.nullSafeToString;
+
 @Slf4j
 @RequiredArgsConstructor
 public class StubRequestController {
@@ -29,7 +31,7 @@ public class StubRequestController {
     public ResponseEntity handle(
         @PathVariable Map<String, String> pathVariables,
         @RequestParam Map<String, String> requestParams,
-        @RequestBody Map<String, String> requestBody
+        @RequestBody(required = false) Map<String, String> requestBody
     ) throws Exception {
         return Arrays.stream(rule.getRequestAndResponseRules())
             .findAny()
@@ -40,9 +42,9 @@ public class StubRequestController {
                 return ResponseEntity
                     .status(response.getStatus())
                     .headers(response.getHttpHeaders())
-                    .header("x-path-variables", pathVariables.toString())
-                    .header("x-request-params", requestParams.toString())
-                    .header("x-request-body", requestBody.toString())
+                    .header("x-path-variables", nullSafeToString(pathVariables))
+                    .header("x-request-params", nullSafeToString(requestParams))
+                    .header("x-request-body", nullSafeToString(requestBody))
                     .body(responseBody);
             })
             .orElse(NO_RULE_RESPONSE);
@@ -52,10 +54,11 @@ public class StubRequestController {
         val helper = new PropertyPlaceholderHelper("${", "}");
         return helper.replacePlaceholders(value, key ->
             maps.stream()
+                .filter(Objects::nonNull)
                 .map(map -> map.get(key))
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElseGet(null)
+                .orElse(null)
         );
     }
 }
