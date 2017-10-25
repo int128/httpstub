@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class RequestAndResponseRule {
     private ResponseRule response;
+    private Where[] where;
 }
