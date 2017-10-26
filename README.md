@@ -1,44 +1,109 @@
-Gradle Hello World [![CircleCI](https://circleci.com/gh/int128/gradle-starter.svg?style=shield)](https://circleci.com/gh/int128/gradle-starter) [![Gradle Status](https://gradleupdate.appspot.com/int128/gradle-starter/status.svg?branch=master)](https://gradleupdate.appspot.com/int128/gradle-starter/status)
-==================
+# stubyaml
 
-This project contains following:
-
-* Example app: `Main.java`
-* Example test: `MainSpec.groovy`
-* Build script: `build.groovy`
-* Running app
-* Publishing an artifact to Bintray (and Maven Central)
-* Gradle wrapper
+YAML based HTTP stub server for API testing.
+Built on Spring Boot.
 
 
-Getting Started
----------------
+## Getting Started
 
-```
-./gradlew run
-```
+Download stubyaml.jar and create `data/users.get.yaml` with following.
 
-
-Publish to Bintray
-------------------
-
-You must provide Bintray credential in `~/.gradle/gradle.properties` as follows:
-
-```properties
-bintrayUser=example
-bintrayKey=secret
+```yaml
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      [
+        {
+          "id": 1,
+          "name": "Foo"
+        },
+        {
+          "id": 2,
+          "name": "Bar"
+        }
+      ]
 ```
 
+Run stubyaml.jar.
+
 ```
-./gradlew bintrayUpload
+java -jar stubyaml.jar
 ```
 
-### CircleCI integration
+Call API as follows.
 
-CircleCI builds the plugin continuously.
-It also publishes an artifact if a tag is pushed and following variables are set.
+```
+curl -v http://localhost:8080/users
+```
 
-Environment Variable        | Value
-----------------------------|------
-`$BINTRAY_USER`             | Bintray user name
-`$BINTRAY_KEY`              | Bintray key
+
+## Examples
+
+### Handle various HTTP methods
+
+For example, create `data/users.post.yaml` for handling POST method.
+Following methods are supported.
+
+- GET
+- HEAD
+- POST
+- PUT
+- PATCH
+- DELETE
+- OPTIONS
+- TRACE
+
+
+### Serve various contents
+
+Here is an example of serving XML.
+
+```yaml
+- response:
+    headers:
+      content-type: application/xml
+    body: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <users>
+        <user>
+          <id>1</id>
+          <name>Foo</name>
+        </user>
+      </users>
+```
+
+Note that body is not validated and possibly illegal content may be sent.
+
+
+### Use path variables
+
+Underscore braced string in file path is treated as a path variable.
+For example, create `data/users/_userId_.get.yaml` for handling GET of `users/1`, `users/2` and so on.
+
+
+### Use placeholders
+
+`${key}` is treated as a placeholder and replaced to matched path variable, request parameter or request body.
+
+For example, create `data/users/_userId_.get.yaml` with following.
+
+```yaml
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      {
+        "id": ${userId},
+        "name": "User#${userId}"
+      }
+```
+
+The stub will serve following content on the request `GET /users/100`.
+
+```json
+{
+  "id": 100,
+  "name": "User#100"
+}
+```
