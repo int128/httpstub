@@ -3,7 +3,7 @@ package org.hidetake.stubyaml;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hidetake.stubyaml.model.Rule;
+import org.hidetake.stubyaml.model.yaml.Route;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -24,7 +24,7 @@ public class RuleYamlLoader {
 
     private final RuleYamlParser ruleYamlParser;
 
-    public Stream<Rule> walk(File baseDirectory) {
+    public Stream<Route> walk(File baseDirectory) {
         if (!baseDirectory.isDirectory()) {
             throw new IllegalStateException("Directory did not found: " + baseDirectory);
         }
@@ -38,7 +38,7 @@ public class RuleYamlLoader {
         }
     }
 
-    public Stream<Rule> mapToRule(Path path, File file) {
+    public Stream<Route> mapToRule(Path path, File file) {
         val m = PATH_PATTERN.matcher(path.toString());
         if (m.matches()) {
             val requestPath = replacePathVariables("/" + m.group(1));
@@ -47,9 +47,10 @@ public class RuleYamlLoader {
 
             if ("yaml".equals(extension)) {
                 return requestMethodOf(requestMethodString)
-                    .map(requestMethod -> ruleYamlParser.parse(file, requestPath, requestMethod))
+                    .map(requestMethod ->
+                        Stream.of(ruleYamlParser.parse(file, requestPath, requestMethod)))
                     .orElseGet(() -> {
-                        log.warn("Invalid request method {} of file {}", requestMethodString, path);
+                        log.warn("Ignored invalid request method {} of file {}", requestMethodString, path);
                         return Stream.empty();
                     });
             } else {

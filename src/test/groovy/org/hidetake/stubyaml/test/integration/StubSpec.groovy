@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class StubSpec extends Specification {
@@ -21,6 +22,22 @@ class StubSpec extends Specification {
         users.body.length == 2
         users.body[0] == new User(1, 'Foo')
         users.body[1] == new User(2, 'Bar')
+    }
+
+    @Unroll
+    def 'GET /users/#id should return a user with placeholder replaced'() {
+        when:
+        def user = restTemplate.getForEntity('/users/{id}', User, [id: id])
+
+        then:
+        user.statusCode == HttpStatus.OK
+        user.body.id == id
+        user.body.name == name
+
+        where:
+        id | name
+        1  | 'User1'
+        2  | 'User2'
     }
 
     def 'POST /users should return a user with placeholder replaced'() {

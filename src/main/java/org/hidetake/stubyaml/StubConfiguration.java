@@ -21,6 +21,7 @@ public class StubConfiguration {
     private String path = "data";
 
     private final RuleYamlLoader ruleYamlLoader;
+    private final RouteCompiler routeCompiler;
 
     @Bean
     RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException {
@@ -30,9 +31,12 @@ public class StubConfiguration {
         val handle = StubRequestController.class.getMethod("handle", Map.class, Map.class, Map.class);
 
         ruleYamlLoader.walk(new File(path))
-            .forEach(rule -> {
-                mapping.registerMapping(rule.toRequestMappingInfo(), new StubRequestController(rule), handle);
-            });
+            .map(routeCompiler::compile)
+            .forEach(route ->
+                mapping.registerMapping(
+                    route.getRequestMappingInfo(),
+                    new StubRequestController(route),
+                    handle));
 
         return mapping;
     }

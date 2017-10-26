@@ -16,9 +16,9 @@ dependencies {
   compile 'commons-io:commons-io:2.5'
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-jetty'
+  compile 'org.codehaus.groovy:groovy-all:2.4.12'
   compileOnly 'org.projectlombok:lombok:1.16.18'
 
-  testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
   testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
   testCompile 'org.springframework.boot:spring-boot-starter-test'

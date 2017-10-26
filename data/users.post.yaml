@@ -3,7 +3,7 @@
       content-type: application/json
     body: |
       {
-        "id": ${id},
-        "name": "${name}",
+        "id": ${body.id},
+        "name": "${body.name}",
         "active": true
       }

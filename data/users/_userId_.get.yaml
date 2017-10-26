@@ -3,12 +3,7 @@
       content-type: application/json
     body: |
       {
-        "id": ${userId},
-        "name": "${userName}"
+        "id": ${path.userId},
+        "name": "User${path.userId}",
+        "age": 35
       }
-  where:
-    - from: userId
-      to: userName
-      map:
-        1: Foo
-        2: Bar

@@ -4,57 +4,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.RequestContext;
-import org.hidetake.stubyaml.model.Rule;
-import org.springframework.http.HttpStatus;
+import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.PropertyPlaceholderHelper;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Arrays;
 import java.util.Map;
-
-import static org.springframework.util.ObjectUtils.nullSafeToString;
 
 @Slf4j
 @RequiredArgsConstructor
 public class StubRequestController {
-    private static final ResponseEntity<String> NO_RULE_RESPONSE =
-        new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-    private final Rule rule;
+    private final CompiledRoute route;
 
     @ResponseBody
     public ResponseEntity handle(
         @PathVariable Map<String, String> pathVariables,
         @RequestParam Map<String, String> requestParams,
-        @RequestBody(required = false) Map<String, String> requestBody
+        @RequestBody(required = false) Map<String, Object> requestBody
     ) {
-        val requestContext = RequestContext.builder()
-            .pathVariables(pathVariables)
-            .requestParams(requestParams)
-            .requestBody(requestBody)
-            .build();
-        return Arrays.stream(rule.getRequestAndResponseRules())
-            .findAny()
-            .map(requestAndResponseRule -> {
-                val response = requestAndResponseRule.getResponse();
-                val responseBody = replacePlaceholders(response.getBody(), requestContext);
-                return ResponseEntity
-                    .status(response.getStatus())
-                    .headers(response.getHttpHeaders())
-                    .header("x-path-variables", nullSafeToString(pathVariables))
-                    .header("x-request-params", nullSafeToString(requestParams))
-                    .header("x-request-body", nullSafeToString(requestBody))
-                    .body(responseBody);
-            })
-            .orElse(NO_RULE_RESPONSE);
-    }
-
-    private static String replacePlaceholders(String value, RequestContext requestContext) {
-        return new PropertyPlaceholderHelper("${", "}")
-            .replacePlaceholders(value, requestContext::find);
+        val requestContext = RequestContext.create(pathVariables, requestParams, requestBody);
+        return route.getRules().stream()
+            .filter(rule -> rule.matches(requestContext))
+            .findFirst()
+            .map(rule -> rule.createResponseEntity(requestContext))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
