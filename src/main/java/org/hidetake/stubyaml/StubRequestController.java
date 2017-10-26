@@ -3,6 +3,7 @@ package org.hidetake.stubyaml;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hidetake.stubyaml.model.RequestContext;
 import org.hidetake.stubyaml.model.Rule;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static org.springframework.util.ObjectUtils.nullSafeToString;
 
@@ -32,13 +31,17 @@ public class StubRequestController {
         @PathVariable Map<String, String> pathVariables,
         @RequestParam Map<String, String> requestParams,
         @RequestBody(required = false) Map<String, String> requestBody
-    ) throws Exception {
+    ) {
+        val requestContext = RequestContext.builder()
+            .pathVariables(pathVariables)
+            .requestParams(requestParams)
+            .requestBody(requestBody)
+            .build();
         return Arrays.stream(rule.getRequestAndResponseRules())
             .findAny()
             .map(requestAndResponseRule -> {
                 val response = requestAndResponseRule.getResponse();
-                val responseBody = replacePlaceholders(response.getBody(),
-                    Arrays.asList(pathVariables, requestParams, requestBody));
+                val responseBody = replacePlaceholders(response.getBody(), requestContext);
                 return ResponseEntity
                     .status(response.getStatus())
                     .headers(response.getHttpHeaders())
@@ -50,15 +53,8 @@ public class StubRequestController {
             .orElse(NO_RULE_RESPONSE);
     }
 
-    private static String replacePlaceholders(String value, List<Map<String, String>> maps) {
-        val helper = new PropertyPlaceholderHelper("${", "}");
-        return helper.replacePlaceholders(value, key ->
-            maps.stream()
-                .filter(Objects::nonNull)
-                .map(map -> map.get(key))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null)
-        );
+    private static String replacePlaceholders(String value, RequestContext requestContext) {
+        return new PropertyPlaceholderHelper("${", "}")
+            .replacePlaceholders(value, requestContext::find);
     }
 }
