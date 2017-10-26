@@ -24,7 +24,7 @@ public class RequestContext {
         return Stream.of(
                 pathVariables.get(key),
                 requestParams.get(key),
-                requestBody.get(key)
+                requestBody != null ? requestBody.get(key) : null
             )
             .filter(Objects::nonNull)
             .findFirst()

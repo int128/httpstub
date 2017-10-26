@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -20,9 +19,6 @@ public class RuleYamlParser {
     public Stream<Rule> parse(File yamlFile, String requestPath, RequestMethod requestMethod) {
         try (val yamlStream = FileUtils.openInputStream(yamlFile)) {
             val rules = new Yaml().loadAs(yamlStream, RequestAndResponseRule[].class);
-
-            log.info("yaml={}", Arrays.toString(rules));
-
             return Stream.of(new Rule(requestPath, requestMethod, rules));
         } catch (IOException e) {
             log.warn("Ignored YAML file {}", yamlFile, e);
