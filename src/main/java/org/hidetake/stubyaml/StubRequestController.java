@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Slf4j
@@ -20,11 +21,12 @@ public class StubRequestController {
 
     @ResponseBody
     public ResponseEntity handle(
+        HttpServletRequest request,
         @PathVariable Map<String, String> pathVariables,
         @RequestParam Map<String, String> requestParams,
-        @RequestBody(required = false) Map<String, Object> requestBody
+        @RequestBody(required = false) Object requestBody
     ) {
-        val requestContext = RequestContext.create(pathVariables, requestParams, requestBody);
+        val requestContext = RequestContext.create(request, pathVariables, requestParams, requestBody);
         return route.getRules().stream()
             .filter(rule -> rule.matches(requestContext))
             .findFirst()

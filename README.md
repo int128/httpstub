@@ -82,9 +82,17 @@ Underscore braced string in file path is treated as a path variable.
 For example, create `data/users/_userId_.get.yaml` for handling GET of `users/1`, `users/2` and so on.
 
 
-### Use placeholders
+### Use script
 
-`${key}` is treated as a placeholder and replaced to matched path variable, request parameter or request body.
+`${key}` in headers and body is treated as a script.
+You can access to following objects via each prefix.
+
+Prefix      | Object
+------------|-------
+`request.`  | `HttpServletRequest` object bound to current request
+`path.`     | Path variables
+`params.`   | Request parameters
+`body.`     | Request body
 
 For example, create `data/users/_userId_.get.yaml` with following.
 
@@ -94,8 +102,8 @@ For example, create `data/users/_userId_.get.yaml` with following.
       content-type: application/json
     body: |
       {
-        "id": ${userId},
-        "name": "User#${userId}"
+        "id": ${path.userId},
+        "name": "User${path.userId}"
       }
 ```
 
@@ -104,6 +112,6 @@ The stub will serve following content on the request `GET /users/100`.
 ```json
 {
   "id": 100,
-  "name": "User#100"
+  "name": "User100"
 }
 ```

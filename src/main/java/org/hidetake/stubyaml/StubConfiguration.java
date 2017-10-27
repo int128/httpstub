@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class StubConfiguration {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val handle = StubRequestController.class.getMethod("handle", Map.class, Map.class, Map.class);
+        val handle = StubRequestController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
 
         ruleYamlLoader.walk(new File(path))
             .map(routeCompiler::compile)
