@@ -1,5 +1,6 @@
 package org.hidetake.stubyaml;
 
+import groovy.lang.GroovyShell;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.TemplateEngine;
 import lombok.val;
@@ -11,15 +12,18 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toMap;
 
 @Component
 public class RuleCompiler {
-    private final TemplateEngine templateEngine = new SimpleTemplateEngine();
+    private final GroovyShell groovyShell = new GroovyShell();
+    private final TemplateEngine templateEngine = new SimpleTemplateEngine(groovyShell);
 
     public CompiledRule compile(Rule rule) {
         val response = rule.getResponse();
         return CompiledRule.builder()
+            .when(ofNullable(rule.getWhen()).map(groovyShell::parse).orElse(null))
             .status(response.getStatus())
             .headers(response.getHeaders()
                 .entrySet()

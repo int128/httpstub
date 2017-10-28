@@ -1,3 +1,19 @@
+- when: params.order == 'desc'
+  response:
+    headers:
+      content-type: application/json
+    body: |
+      [
+        {
+          "id": 2,
+          "name": "Bar"
+        },
+        {
+          "id": 1,
+          "name": "Foo"
+        }
+      ]
+
 - response:
     headers:
       content-type: application/json

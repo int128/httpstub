@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Rule {
-    private RequestRule request;
-    private ResponseRule response;
+    private String when;
+    private Response response;
 }
