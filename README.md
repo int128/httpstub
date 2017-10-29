@@ -1,6 +1,6 @@
 # stubyaml
 
-YAML based HTTP stub server for API testing.
+A YAML based HTTP stub server for API testing.
 Built on Spring Boot.
 
 
@@ -84,7 +84,7 @@ For example, create `data/users/_userId_.get.yaml` for handling GET of `users/1`
 
 ### Use script
 
-`${key}` in headers and body is treated as a script.
+`${key}` in headers and body is parsed as a Groovy script.
 You can access to following objects via each prefix.
 
 Prefix      | Object
@@ -114,4 +114,26 @@ The stub will serve following content on the request `GET /users/100`.
   "id": 100,
   "name": "User100"
 }
+```
+
+
+## Pattern match
+
+A YAML file has one or more rules.
+The stub evaluates `when` and returns the first matched `response`.
+
+```yaml
+- when: params.order == 'desc'
+  response:
+    headers:
+      content-type: application/json
+    body: |
+      [3, 2, 1]
+
+- when: params.order == 'asc'
+  response:
+    headers:
+      content-type: application/json
+    body: |
+      [1, 2, 3]
 ```
