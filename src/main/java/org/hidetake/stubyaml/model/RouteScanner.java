@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RuleScanner {
+public class RouteScanner {
     private static final Pattern PATH_PATTERN = Pattern.compile("(.+)\\.(.+?)\\.(.+?)$");
     private static final Pattern PATH_VARIABLE_PATTERN = Pattern.compile("_(.+?)_");
 

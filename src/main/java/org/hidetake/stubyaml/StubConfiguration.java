@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.RouteCompiler;
-import org.hidetake.stubyaml.model.RuleScanner;
+import org.hidetake.stubyaml.model.RouteScanner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -23,7 +23,7 @@ public class StubConfiguration {
     @Setter
     private String path = "data";
 
-    private final RuleScanner ruleScanner;
+    private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
 
     @Bean
@@ -33,7 +33,7 @@ public class StubConfiguration {
 
         val handleMethod = StubController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
 
-        ruleScanner.scan(new File(path))
+        routeScanner.scan(new File(path))
             .map(routeCompiler::compile)
             .forEach(route -> {
                 val requestMappingInfo = route.getRequestMappingInfo();

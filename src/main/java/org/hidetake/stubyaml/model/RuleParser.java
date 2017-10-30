@@ -19,13 +19,15 @@ import static java.util.Collections.emptyList;
 @Slf4j
 @Component
 public class RuleParser {
+    private final Yaml yaml = new Yaml();
+
     public Route parse(File yamlFile, String requestPath, RequestMethod requestMethod) {
         return new Route(requestPath, requestMethod, parse(yamlFile));
     }
 
     private List<Rule> parse(File yamlFile) {
         try (val yamlStream = FileUtils.openInputStream(yamlFile)) {
-            val rules = new Yaml().loadAs(yamlStream, Rule[].class);
+            val rules = yaml.loadAs(yamlStream, Rule[].class);
             if (rules == null) {
                 return emptyList();
             } else {
