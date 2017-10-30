@@ -4,6 +4,7 @@ import org.hidetake.stubyaml.test.integration.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -49,6 +50,18 @@ class StubSpec extends Specification {
         users.body.id == 5
         users.body.name == 'Baz'
         users.body.active
+    }
+
+    def 'DELETE /users/#id should return 204'() {
+        when:
+        def response = restTemplate.exchange('/users/{id}', HttpMethod.DELETE, null, String, [id: id])
+
+        then:
+        response.statusCode == HttpStatus.NO_CONTENT
+        !response.hasBody()
+
+        where:
+        id << [1, 2]
     }
 
     def 'GET /authorities should return 500'() {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.hidetake.stubyaml.model.execution.RequestContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +32,7 @@ public class StubController {
             .filter(rule -> rule.matches(requestContext))
             .findFirst()
             .map(rule -> rule.createResponseEntity(requestContext))
-            .orElseGet(() -> ResponseEntity.notFound().build());
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(String.format("No rule matched for this route %s", route.getRequestMappingInfo())));
     }
 }

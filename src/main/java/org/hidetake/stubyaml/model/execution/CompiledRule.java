@@ -27,16 +27,15 @@ public class CompiledRule {
     }
 
     public ResponseEntity createResponseEntity(RequestContext requestContext) {
+        val builder = ResponseEntity.status(status);
+        headers.forEach((key, expression) -> {
+            val value = expression.make(requestContext.getBinding()).toString();
+            builder.header(key, value);
+        });
         if (body == null) {
-            return null;
+            return builder.build();
         } else {
-            val builder = ResponseEntity.status(status);
-            headers.forEach((key, expression) -> {
-                val value = expression.make(requestContext.getBinding()).toString();
-                builder.header(key, value);
-            });
-            val body = this.body.make(requestContext.getBinding()).toString();
-            return builder.body(body);
+            return builder.body(body.make(requestContext.getBinding()).toString());
         }
     }
 }

@@ -24,4 +24,5 @@ dependencies {
   testCompile 'org.springframework.boot:spring-boot-starter-test'
   testRuntime 'cglib:cglib-nodep:3.2.5'
   testRuntime 'org.objenesis:objenesis:2.6'
+  testRuntime 'org.apache.httpcomponents:httpclient'
 }

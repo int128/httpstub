@@ -3,6 +3,7 @@ package org.hidetake.stubyaml;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.RuleScanner;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class StubConfiguration {
@@ -36,6 +38,7 @@ public class StubConfiguration {
             .forEach(route -> {
                 val requestMappingInfo = route.getRequestMappingInfo();
                 val controller = new StubController(route);
+                log.info("Mapping route {}", route);
                 mapping.registerMapping(requestMappingInfo, controller, handleMethod);
             });
 
