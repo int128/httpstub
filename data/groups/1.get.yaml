@@ -1,0 +1,11 @@
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      {
+        "id": 1,
+        "name": "Example Group",
+        "users": [
+          {"id": 1, "name": "Foo"}
+        ]
+      }

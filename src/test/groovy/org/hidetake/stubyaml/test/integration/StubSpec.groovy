@@ -1,5 +1,6 @@
 package org.hidetake.stubyaml.test.integration
 
+import org.hidetake.stubyaml.test.integration.model.Group
 import org.hidetake.stubyaml.test.integration.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -62,6 +63,15 @@ class StubSpec extends Specification {
 
         where:
         id << [1, 2]
+    }
+
+    def 'GET /groups/1 should return array of groups (nested object)'() {
+        when:
+        def groups = restTemplate.getForEntity('/groups/1', Group)
+
+        then:
+        groups.statusCode == HttpStatus.OK
+        groups.body == new Group(1, 'Example Group', [new User(1, "Foo")])
     }
 
     def 'GET /authorities should return 500'() {
