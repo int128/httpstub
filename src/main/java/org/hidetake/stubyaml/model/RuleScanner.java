@@ -6,6 +6,7 @@ import lombok.val;
 import org.hidetake.stubyaml.model.yaml.Route;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +50,17 @@ public class RuleScanner {
             if ("yaml".equals(extension)) {
                 log.info("Loading /{}", path);
                 return requestMethodOf(requestMethodString)
-                    .map(requestMethod ->
-                        Stream.of(ruleParser.parse(file, requestPath, requestMethod)))
+                    .map(requestMethod -> {
+                        try {
+                            val route = ruleParser.parse(file, requestPath, requestMethod);
+                            return Stream.of(route);
+                        } catch (YAMLException e) {
+                            log.error("Ignored invalid YAML file /{}\n{}", path, e.getLocalizedMessage());
+                            return Stream.<Route>empty();
+                        }
+                    })
                     .orElseGet(() -> {
-                        log.warn("Ignored invalid request method {} of file {}", requestMethodString, path);
+                        log.error("Ignored invalid request method {} of file /{}", requestMethodString, path);
                         return Stream.empty();
                     });
             } else {
