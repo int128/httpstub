@@ -46,6 +46,7 @@ public class RuleYamlLoader {
             val extension = m.group(3);
 
             if ("yaml".equals(extension)) {
+                log.info("Loading /{}", path);
                 return requestMethodOf(requestMethodString)
                     .map(requestMethod ->
                         Stream.of(ruleYamlParser.parse(file, requestPath, requestMethod)))

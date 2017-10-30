@@ -28,8 +28,12 @@ public class CompiledRule {
     }
 
     public ResponseEntity createResponseEntity(RequestContext requestContext) {
-        val builder = ResponseEntity.status(status);
-        headers.forEach((key, expression) -> builder.header(key, expression.evaluate(requestContext)));
-        return builder.body(body.evaluate(requestContext));
+        if (body == null) {
+            return null;
+        } else {
+            val builder = ResponseEntity.status(status);
+            headers.forEach((key, expression) -> builder.header(key, expression.evaluate(requestContext)));
+            return builder.body(body.evaluate(requestContext));
+        }
     }
 }
