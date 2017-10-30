@@ -1,14 +1,12 @@
 package org.hidetake.stubyaml.model;
 
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
-import groovy.text.TemplateEngine;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
+import org.hidetake.stubyaml.model.execution.Expression;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +19,6 @@ import static org.springframework.util.Assert.notNull;
 @Slf4j
 @Component
 public class RuleCompiler {
-    private final GroovyShell groovyShell = new GroovyShell();
-    private final TemplateEngine templateEngine = new SimpleTemplateEngine(groovyShell);
-
     public CompiledRule compile(Rule rule) {
         notNull(rule, "rule should not be null");
 
@@ -32,7 +27,7 @@ public class RuleCompiler {
         notNull(response.getHeaders(), "headers should not be null");
 
         return CompiledRule.builder()
-            .when(toScript(rule.getWhen()))
+            .when(toExpression(rule.getWhen()))
             .status(response.getStatus())
             .headers(response.getHeaders()
                 .entrySet()
@@ -42,12 +37,12 @@ public class RuleCompiler {
             .build();
     }
 
-    private Script toScript(String expression) {
+    private Expression toExpression(String expression) {
         if (expression == null) {
             return null;
         }
         try {
-            return groovyShell.parse(expression);
+            return Expression.compile(expression);
         } catch (CompilationFailedException e) {
             log.warn("Invalid expression {}", expression, e);
             return null;
@@ -59,7 +54,7 @@ public class RuleCompiler {
             return null;
         }
         try {
-            return templateEngine.createTemplate(expression);
+            return new SimpleTemplateEngine().createTemplate(expression);
         } catch (CompilationFailedException | ClassNotFoundException | IOException e) {
             log.warn("Invalid expression {}", expression, e);
             return null;
