@@ -3,12 +3,12 @@ package org.hidetake.stubyaml.model;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import groovy.text.SimpleTemplateEngine;
+import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
-import org.hidetake.stubyaml.model.execution.Template;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +59,7 @@ public class RuleCompiler {
             return null;
         }
         try {
-            return new Template(templateEngine.createTemplate(expression));
+            return templateEngine.createTemplate(expression);
         } catch (CompilationFailedException | ClassNotFoundException | IOException e) {
             log.warn("Invalid expression {}", expression, e);
             return null;

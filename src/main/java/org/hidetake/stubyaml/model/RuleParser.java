@@ -18,7 +18,7 @@ import static java.util.Collections.emptyList;
 
 @Slf4j
 @Component
-public class RuleYamlParser {
+public class RuleParser {
     public Route parse(File yamlFile, String requestPath, RequestMethod requestMethod) {
         return new Route(requestPath, requestMethod, parse(yamlFile));
     }

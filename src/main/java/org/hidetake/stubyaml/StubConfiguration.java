@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.hidetake.stubyaml.model.RouteCompiler;
-import org.hidetake.stubyaml.model.RuleYamlLoader;
+import org.hidetake.stubyaml.model.RuleScanner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -21,7 +21,7 @@ public class StubConfiguration {
     @Setter
     private String path = "data";
 
-    private final RuleYamlLoader ruleYamlLoader;
+    private final RuleScanner ruleScanner;
     private final RouteCompiler routeCompiler;
 
     @Bean
@@ -31,7 +31,7 @@ public class StubConfiguration {
 
         val handleMethod = StubController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
 
-        ruleYamlLoader.walk(new File(path))
+        ruleScanner.scan(new File(path))
             .map(routeCompiler::compile)
             .forEach(route -> {
                 val requestMappingInfo = route.getRequestMappingInfo();

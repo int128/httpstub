@@ -2,6 +2,7 @@ package org.hidetake.stubyaml.model.execution;
 
 import groovy.lang.Binding;
 import groovy.lang.Script;
+import groovy.text.Template;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
@@ -32,8 +33,12 @@ public class CompiledRule {
             return null;
         } else {
             val builder = ResponseEntity.status(status);
-            headers.forEach((key, expression) -> builder.header(key, expression.evaluate(requestContext)));
-            return builder.body(body.evaluate(requestContext));
+            headers.forEach((key, expression) -> {
+                val value = expression.make(requestContext.getBinding()).toString();
+                builder.header(key, value);
+            });
+            val body = this.body.make(requestContext.getBinding()).toString();
+            return builder.body(body);
         }
     }
 }

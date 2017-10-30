@@ -18,16 +18,17 @@ import java.util.stream.Stream;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RuleYamlLoader {
+public class RuleScanner {
     private static final Pattern PATH_PATTERN = Pattern.compile("(.+)\\.(.+?)\\.(.+?)$");
     private static final Pattern PATH_VARIABLE_PATTERN = Pattern.compile("_(.+?)_");
 
-    private final RuleYamlParser ruleYamlParser;
+    private final RuleParser ruleParser;
 
-    public Stream<Route> walk(File baseDirectory) {
+    public Stream<Route> scan(File baseDirectory) {
         if (!baseDirectory.isDirectory()) {
             throw new IllegalStateException("Directory did not found: " + baseDirectory);
         }
+        log.info("Scanning {}", baseDirectory);
         val basePath = baseDirectory.toPath();
         try {
             return Files.walk(basePath)
@@ -49,7 +50,7 @@ public class RuleYamlLoader {
                 log.info("Loading /{}", path);
                 return requestMethodOf(requestMethodString)
                     .map(requestMethod ->
-                        Stream.of(ruleYamlParser.parse(file, requestPath, requestMethod)))
+                        Stream.of(ruleParser.parse(file, requestPath, requestMethod)))
                     .orElseGet(() -> {
                         log.warn("Ignored invalid request method {} of file {}", requestMethodString, path);
                         return Stream.empty();
