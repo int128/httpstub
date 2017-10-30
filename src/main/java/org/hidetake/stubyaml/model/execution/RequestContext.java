@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml.model;
+package org.hidetake.stubyaml.model.execution;
 
 import lombok.Data;
 import lombok.val;

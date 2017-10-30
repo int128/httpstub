@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml;
+package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
@@ -26,9 +26,7 @@ public class RouteCompiler {
                 null,
                 null
             ))
-            .rules(route.getRules().stream()
-                .map(ruleCompiler::compile)
-                .collect(toList()))
+            .rules(route.getRules().stream().map(ruleCompiler::compile).collect(toList()))
             .build();
     }
 }

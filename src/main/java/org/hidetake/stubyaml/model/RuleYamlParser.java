@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml;
+package org.hidetake.stubyaml.model;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -11,23 +11,24 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 @Slf4j
 @Component
 public class RuleYamlParser {
     public Route parse(File yamlFile, String requestPath, RequestMethod requestMethod) {
-        val rules = parse(yamlFile).collect(Collectors.toList());
-        return new Route(requestPath, requestMethod, rules);
+        return new Route(requestPath, requestMethod, parse(yamlFile));
     }
 
-    public Stream<Rule> parse(File yamlFile) {
+    private List<Rule> parse(File yamlFile) {
         try (val yamlStream = FileUtils.openInputStream(yamlFile)) {
-            return Stream.of(new Yaml().loadAs(yamlStream, Rule[].class));
+            return asList(new Yaml().loadAs(yamlStream, Rule[].class));
         } catch (IOException e) {
             log.warn("Ignored YAML file {}", yamlFile, e);
-            return Stream.empty();
+            return emptyList();
         }
     }
 }

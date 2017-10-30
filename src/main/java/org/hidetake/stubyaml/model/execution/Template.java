@@ -1,7 +1,6 @@
 package org.hidetake.stubyaml.model.execution;
 
 import lombok.Data;
-import org.hidetake.stubyaml.model.RequestContext;
 
 @Data
 public class Template {

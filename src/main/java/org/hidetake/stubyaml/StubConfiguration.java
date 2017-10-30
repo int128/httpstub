@@ -3,8 +3,9 @@ package org.hidetake.stubyaml;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hidetake.stubyaml.model.RouteCompiler;
+import org.hidetake.stubyaml.model.RuleYamlLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.Map;
 
-@Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class StubConfiguration {
@@ -29,15 +29,15 @@ public class StubConfiguration {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val handle = StubRequestController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
+        val handleMethod = StubController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
 
         ruleYamlLoader.walk(new File(path))
             .map(routeCompiler::compile)
-            .forEach(route ->
-                mapping.registerMapping(
-                    route.getRequestMappingInfo(),
-                    new StubRequestController(route),
-                    handle));
+            .forEach(route -> {
+                val requestMappingInfo = route.getRequestMappingInfo();
+                val controller = new StubController(route);
+                mapping.registerMapping(requestMappingInfo, controller, handleMethod);
+            });
 
         return mapping;
     }

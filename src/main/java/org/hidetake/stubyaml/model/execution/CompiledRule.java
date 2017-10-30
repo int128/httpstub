@@ -5,7 +5,6 @@ import groovy.lang.Script;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
-import org.hidetake.stubyaml.model.RequestContext;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;

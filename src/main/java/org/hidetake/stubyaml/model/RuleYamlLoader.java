@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml;
+package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

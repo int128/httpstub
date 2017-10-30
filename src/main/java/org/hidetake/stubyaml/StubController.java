@@ -3,8 +3,8 @@ package org.hidetake.stubyaml;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hidetake.stubyaml.model.RequestContext;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
+import org.hidetake.stubyaml.model.execution.RequestContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-public class StubRequestController {
+public class StubController {
     private final CompiledRoute route;
 
     @ResponseBody
