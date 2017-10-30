@@ -6,5 +6,6 @@ import groovy.transform.Canonical
 class User {
     int id
     String name
+    int age
     boolean active
 }

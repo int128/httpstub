@@ -35,11 +35,13 @@ class StubSpec extends Specification {
         user.statusCode == HttpStatus.OK
         user.body.id == id
         user.body.name == name
+        user.body.age == age
 
         where:
-        id | name
-        1  | 'User1'
-        2  | 'User2'
+        id | name   | age
+        1  | 'Foo'  | 35
+        2  | 'Bar'  | 100
+        3  | 'Baz'  | 3
     }
 
     def 'POST /users should return a user with placeholder replaced'() {

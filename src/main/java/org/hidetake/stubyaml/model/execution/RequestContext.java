@@ -17,11 +17,11 @@ public class RequestContext {
         Map<String, String> requestParams,
         Object requestBody
     ) {
-        val requestContext = new RequestContext(new HashMap<>(512));
-        requestContext.binding.put("request", request);
-        requestContext.binding.put("path", pathVariables);
-        requestContext.binding.put("params", requestParams);
-        requestContext.binding.put("body", requestBody);
-        return requestContext;
+        val binding = new HashMap<String, Object>(512);
+        binding.put("request", request);
+        binding.put("path", pathVariables);
+        binding.put("params", requestParams);
+        binding.put("body", requestBody);
+        return new RequestContext(binding);
     }
 }

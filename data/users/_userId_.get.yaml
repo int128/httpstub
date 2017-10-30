@@ -4,6 +4,19 @@
     body: |
       {
         "id": ${path.userId},
-        "name": "User${path.userId}",
-        "age": 35
+        "name": "${table.userName}",
+        "age": ${table.age}
       }
+    tables:
+    - name: userName
+      key: path.userId
+      values:
+        1: Foo
+        2: Bar
+        3: Baz
+    - name: age
+      key: path.userId
+      values:
+        1: 35
+        2: 100
+        3: 3

@@ -107,7 +107,7 @@ For example, create `data/users/_userId_.get.yaml` with following.
       }
 ```
 
-The stub will serve following content on the request `GET /users/100`.
+The stub will serve following body on the request `GET /users/100`.
 
 ```json
 {
@@ -136,4 +136,54 @@ The stub evaluates `when` and returns the first matched `response`.
       content-type: application/json
     body: |
       [1, 2, 3]
+```
+
+
+## Replace variable by table lookup
+
+For example, create `data/users/_userId_.get.yaml` with following rule.
+
+```yaml
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      {
+        "id": ${path.userId},
+        "name": "${tables.userName}",
+        "age": ${tables.age}
+      }
+    tables:
+    - name: userName
+      key: path.userId
+      values:
+        1: Foo
+        2: Bar
+        3: Baz
+    - name: age
+      key: path.userId
+      values:
+        1: 35
+        2: 100
+        3: 3
+```
+
+The stub will serve following body on the request `GET /users/1`:
+
+```json
+{
+  "id": 1,
+  "name": "Foo",
+  "age": 35
+}
+```
+
+And the request `GET /users/2`:
+
+```json
+{
+  "id": 2,
+  "name": "Bar",
+  "age": 100
+}
 ```
