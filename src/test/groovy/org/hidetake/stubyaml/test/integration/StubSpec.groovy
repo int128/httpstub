@@ -71,4 +71,12 @@ class StubSpec extends Specification {
         then:
         response.statusCode == HttpStatus.INTERNAL_SERVER_ERROR
     }
+
+    def 'GET /empty should return 404'() {
+        when:
+        def response = restTemplate.getForEntity('/empty', String)
+
+        then:
+        response.statusCode == HttpStatus.NOT_FOUND
+    }
 }

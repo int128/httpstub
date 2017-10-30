@@ -25,7 +25,12 @@ public class RuleParser {
 
     private List<Rule> parse(File yamlFile) {
         try (val yamlStream = FileUtils.openInputStream(yamlFile)) {
-            return asList(new Yaml().loadAs(yamlStream, Rule[].class));
+            val rules = new Yaml().loadAs(yamlStream, Rule[].class);
+            if (rules == null) {
+                return emptyList();
+            } else {
+                return asList(rules);
+            }
         } catch (IOException e) {
             log.warn("Ignored YAML file {}", yamlFile, e);
             return emptyList();
