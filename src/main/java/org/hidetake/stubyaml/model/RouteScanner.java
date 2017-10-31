@@ -12,9 +12,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,33 +37,33 @@ public class RouteScanner {
         try {
             return Files.walk(basePath)
                 .filter(path -> path.toFile().isFile())
-                .flatMap(path -> mapToRule(basePath.relativize(path), path.toFile()));
+                .flatMap(path -> mapToRule(toUrlPath(basePath.relativize(path)), path.toFile()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Stream<Route> mapToRule(Path path, File file) {
-        val m = PATH_PATTERN.matcher(path.toString());
+    public Stream<Route> mapToRule(String path, File file) {
+        val m = PATH_PATTERN.matcher(path);
         if (m.matches()) {
-            val requestPath = replacePathVariables("/" + m.group(1));
+            val requestPath = replacePathVariables(m.group(1));
             val requestMethodString = m.group(2).toUpperCase();
             val extension = m.group(3);
 
-            if ("yaml".equals(extension)) {
-                log.info("Loading /{}", path);
+            if (Objects.equals(extension, "yaml")) {
+                log.info("Loading {}", path);
                 return requestMethodOf(requestMethodString)
                     .map(requestMethod -> {
                         try {
                             val route = ruleParser.parse(file, requestPath, requestMethod);
                             return Stream.of(route);
                         } catch (YAMLException e) {
-                            log.error("Ignored invalid YAML file /{}\n{}", path, e.getLocalizedMessage());
+                            log.error("Ignored invalid YAML file {}\n{}", path, e.getLocalizedMessage());
                             return Stream.<Route>empty();
                         }
                     })
                     .orElseGet(() -> {
-                        log.error("Ignored invalid request method {} of file /{}", requestMethodString, path);
+                        log.error("Ignored invalid request method {} for path {}", requestMethodString, path);
                         return Stream.empty();
                     });
             } else {
@@ -71,6 +74,12 @@ public class RouteScanner {
             log.warn("Ignored file {}", path);
             return Stream.empty();
         }
+    }
+
+    private static String toUrlPath(Path path) {
+        return "/" + StreamSupport.stream(path.spliterator(), false)
+            .map(Path::toString)
+            .collect(Collectors.joining("/"));
     }
 
     private static String replacePathVariables(String path) {
