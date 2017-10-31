@@ -94,14 +94,15 @@ For example, create `data/users/_userId_.get.yaml` for handling GET of `users/1`
 
 ### Use script
 
-`${key}` in headers and body is parsed as a Groovy script.
-You can access to following objects via each prefix.
+Header value and body is parsed as a Groovy template.
+You can access to following objects via the script block `${}`.
 
 Prefix      | Object
 ------------|-------
 `request.`  | `HttpServletRequest` object bound to current request
 `path.`     | Path variables
-`params.`   | Request parameters
+`headers.`  | Request headers
+`params.`   | Request parameters (query string or form)
 `body.`     | Request body
 
 For example, create `data/users/_userId_.get.yaml` with following.
