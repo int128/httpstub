@@ -28,22 +28,18 @@ public class RouteScanner {
 
     private final RuleParser ruleParser;
 
-    public Stream<Route> scan(File baseDirectory) {
+    public Stream<Route> scan(File baseDirectory) throws IOException {
         if (!baseDirectory.isDirectory()) {
             throw new IllegalStateException("Directory did not found: " + baseDirectory);
         }
         log.info("Scanning {}", baseDirectory);
         val basePath = baseDirectory.toPath();
-        try {
-            return Files.walk(basePath)
-                .filter(path -> path.toFile().isFile())
-                .flatMap(path -> mapToRule(toUrlPath(basePath.relativize(path)), path.toFile()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return Files.walk(basePath)
+            .filter(path -> path.toFile().isFile())
+            .flatMap(path -> mapToRoute(toUrlPath(basePath.relativize(path)), path.toFile()));
     }
 
-    public Stream<Route> mapToRule(String path, File file) {
+    private Stream<Route> mapToRoute(String path, File file) {
         val m = PATH_PATTERN.matcher(path);
         if (m.matches()) {
             val requestPath = replacePathVariables(m.group(1));

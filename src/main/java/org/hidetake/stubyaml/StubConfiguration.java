@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class StubConfiguration {
     private final RouteCompiler routeCompiler;
 
     @Bean
-    RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException {
+    RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException, IOException {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
