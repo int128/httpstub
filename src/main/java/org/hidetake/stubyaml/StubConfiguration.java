@@ -25,19 +25,25 @@ public class StubConfiguration {
 
     private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
+    private final StubLogger stubLogger;
 
     @Bean
     RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val handleMethod = StubController.class.getMethod("handle", HttpServletRequest.class, Map.class, Map.class, Object.class);
+        val handleMethod = StubController.class.getMethod("handle",
+            HttpServletRequest.class,
+            Map.class,
+            Map.class,
+            Map.class,
+            Object.class);
 
         routeScanner.scan(new File(path))
             .map(routeCompiler::compile)
             .forEach(route -> {
                 val requestMappingInfo = route.getRequestMappingInfo();
-                val controller = new StubController(route);
+                val controller = new StubController(route, stubLogger);
                 log.info("Mapping route {}", route);
                 mapping.registerMapping(requestMappingInfo, controller, handleMethod);
             });
