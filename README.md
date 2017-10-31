@@ -25,16 +25,26 @@ Download stubyaml.jar and create `data/users.get.yaml` with following.
       ]
 ```
 
-Run stubyaml.jar.
+Run the application.
 
 ```
-java -jar stubyaml.jar
+./gradlew bootRun
 ```
 
 Call API as follows.
 
 ```
 curl -v http://localhost:8080/users
+```
+
+
+## Configuration
+
+Suppress request and response log for improving performance.
+
+```
+export NO_REQUEST_RESPONSE_LOG=1
+./gradlew bootRun
 ```
 
 

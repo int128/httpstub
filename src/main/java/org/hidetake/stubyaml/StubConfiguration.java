@@ -25,7 +25,6 @@ public class StubConfiguration {
 
     private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
-    private final StubLogger stubLogger;
 
     @Bean
     RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException {
@@ -43,7 +42,7 @@ public class StubConfiguration {
             .map(routeCompiler::compile)
             .forEach(route -> {
                 val requestMappingInfo = route.getRequestMappingInfo();
-                val controller = new StubController(route, stubLogger);
+                val controller = new StubController(route);
                 log.info("Mapping route {}", route);
                 mapping.registerMapping(requestMappingInfo, controller, handleMethod);
             });

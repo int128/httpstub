@@ -14,7 +14,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StubController {
     private final CompiledRoute route;
-    private final StubLogger logger;
 
     @ResponseBody
     public ResponseEntity handle(
@@ -31,18 +30,11 @@ public class StubController {
             .requestParams(requestParams)
             .requestBody(requestBody)
             .build();
-
-        logger.logRequest(requestContext);
-
-        val response = route.getRules().stream()
+        return route.getRules().stream()
             .filter(rule -> rule.matches(requestContext))
             .findFirst()
             .map(rule -> rule.createResponseEntity(requestContext))
             .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(String.format("No rule matched for this route %s", route.getRequestMappingInfo())));
-
-        logger.logResponse(requestContext, response);
-
-        return response;
     }
 }
