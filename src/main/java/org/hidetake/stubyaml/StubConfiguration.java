@@ -9,6 +9,7 @@ import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.RouteScanner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,14 +40,24 @@ public class StubConfiguration {
             Map.class,
             Object.class);
 
-        routeScanner.scan(new File(path))
-            .map(routeCompiler::compile)
-            .forEach(route -> {
-                val requestMappingInfo = route.getRequestMappingInfo();
-                val controller = new StubController(route);
-                log.info("Mapping route {}", route);
-                mapping.registerMapping(requestMappingInfo, controller, handleMethod);
-            });
+        val baseDirectory = new File(path);
+        if (baseDirectory.isDirectory()) {
+            if (!ObjectUtils.isEmpty(baseDirectory.listFiles())) {
+                log.info("Scanning data directory {}", baseDirectory.getAbsolutePath());
+                routeScanner.scan(baseDirectory)
+                    .map(routeCompiler::compile)
+                    .forEach(route -> {
+                        val requestMappingInfo = route.getRequestMappingInfo();
+                        val controller = new StubController(route);
+                        log.info("Mapping route {}", route);
+                        mapping.registerMapping(requestMappingInfo, controller, handleMethod);
+                    });
+            } else {
+                log.warn("No rule found in {}", baseDirectory.getAbsolutePath());
+            }
+        } else {
+            log.warn("No data directory {}", baseDirectory.getAbsolutePath());
+        }
 
         return mapping;
     }

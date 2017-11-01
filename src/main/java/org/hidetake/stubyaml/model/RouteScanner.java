@@ -28,9 +28,6 @@ public class RouteScanner {
     private final RuleParser ruleParser;
 
     public Stream<Route> scan(File baseDirectory) throws IOException {
-        if (!baseDirectory.isDirectory()) {
-            throw new IllegalStateException("Directory did not found: " + baseDirectory);
-        }
         log.info("Scanning {}", baseDirectory);
         val basePath = baseDirectory.toPath();
         return Files.walk(basePath)
