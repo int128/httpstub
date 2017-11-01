@@ -55,6 +55,7 @@ class StubSpec extends Specification {
         users.body.active
     }
 
+    @Unroll
     def 'DELETE /users/#id should return 204'() {
         when:
         def response = restTemplate.exchange('/users/{id}', HttpMethod.DELETE, null, String, [id: id])
@@ -74,6 +75,21 @@ class StubSpec extends Specification {
         then:
         groups.statusCode == HttpStatus.OK
         groups.body == new Group(1, 'Example Group', [new User(1, "Foo")])
+    }
+
+    @Unroll
+    def 'GET /numbers?order=#order should return condition matched response'() {
+        when:
+        def response = restTemplate.getForEntity("/numbers?order=$order", List)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body == body
+
+        where:
+        order   | body
+        'asc'   | [1, 2, 3]
+        'desc'  | [3, 2, 1]
     }
 
     def 'GET /authorities should return 500'() {
