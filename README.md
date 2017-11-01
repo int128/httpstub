@@ -1,12 +1,25 @@
-# stubyaml
+# stubyaml [![CircleCI](https://circleci.com/gh/int128/stubyaml.svg?style=shield)](https://circleci.com/gh/int128/stubyaml) [![Gradle Status](https://gradleupdate.appspot.com/int128/stubyaml/status.svg)](https://gradleupdate.appspot.com/int128/stubyaml/status)
 
 A YAML based HTTP stub server for API testing.
-Built on Spring Boot.
+
+It has following key features:
+
+- Easy to run and deploy
+- Declarative API definition with YAML
+- Flexible template and pattern matching with Groovy
 
 
 ## Getting Started
 
-Download stubyaml.jar and create `data/users.get.yaml` with following.
+Java 8 is required.
+Download the latest JAR from [here](https://github.com/int128/stubyaml/releases).
+
+```
+mkdir -p data
+vim users.get.yaml
+```
+
+Create YAML file `data/users.get.yaml` as following:
 
 ```yaml
 - response:
@@ -25,16 +38,40 @@ Download stubyaml.jar and create `data/users.get.yaml` with following.
       ]
 ```
 
-Run the application.
+Run the application:
 
 ```
-./gradlew bootRun
+java -jar stubyaml.jar
 ```
 
-Call API as follows.
+Invoke the API:
 
 ```
 curl -v http://localhost:8080/users
+*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+> GET /users HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< Date: Wed, 01 Nov 2017 00:56:43 GMT
+< Content-Type: application/json
+< Content-Length: 83
+<
+[
+  {
+    "id": 1,
+    "name": "Foo"
+  },
+  {
+    "id": 2,
+    "name": "Bar"
+  }
+]
+* Connection #0 to host localhost left intact
 ```
 
 
@@ -43,15 +80,22 @@ curl -v http://localhost:8080/users
 Suppress request and response log for improving performance.
 
 ```
+java -jar stubyaml.jar --no-request-response-log
+```
+
+Instead environment variables can be used.
+
+```
 export NO_REQUEST_RESPONSE_LOG=1
-./gradlew bootRun
+java -jar stubyaml.jar
 ```
 
 
 ## Examples
 
-### Handle various HTTP methods
+### Handling various HTTP methods
 
+Specify HTTP method in the extension part of filename.
 For example, create `data/users.post.yaml` for handling POST method.
 Following methods are supported.
 
@@ -65,9 +109,9 @@ Following methods are supported.
 - TRACE
 
 
-### Serve various contents
+### Serving various contents
 
-Here is an example of serving XML.
+Set the content type header as follows:
 
 ```yaml
 - response:
@@ -83,16 +127,14 @@ Here is an example of serving XML.
       </users>
 ```
 
-Note that body is not validated and possibly illegal content may be sent.
 
-
-### Use path variables
+### Path variables
 
 Underscore braced string in file path is treated as a path variable.
-For example, create `data/users/_userId_.get.yaml` for handling GET of `users/1`, `users/2` and so on.
+For example, create `/users/_userId_.get.yaml` for handling `/users/1`, `/users/2` and so on.
 
 
-### Use script
+### Groovy template
 
 Header value and body is parsed as a Groovy template.
 You can access to following objects via the script block `${}`.
@@ -105,7 +147,7 @@ Prefix      | Object
 `params.`   | Request parameters (query string or form)
 `body.`     | Request body
 
-For example, create `data/users/_userId_.get.yaml` with following.
+For example, create `/users/_userId_.get.yaml` as following:
 
 ```yaml
 - response:
@@ -118,7 +160,7 @@ For example, create `data/users/_userId_.get.yaml` with following.
       }
 ```
 
-The stub will serve following body on the request `GET /users/100`.
+The stub will return the following response on the request `GET /users/100`:
 
 ```json
 {
@@ -128,10 +170,12 @@ The stub will serve following body on the request `GET /users/100`.
 ```
 
 
-## Pattern match
+### Pattern matching
 
 A YAML file has one or more rules.
-The stub evaluates `when` and returns the first matched `response`.
+The stub evaluates all rules and returns the first matched `response`.
+
+Here is the example of `/numbers.get.yaml` as follows:
 
 ```yaml
 - when: params.order == 'desc'
@@ -149,10 +193,32 @@ The stub evaluates `when` and returns the first matched `response`.
       [1, 2, 3]
 ```
 
+The stub will return the following response on the request `GET /numbers?order=asc`:
 
-## Replace variable by table lookup
+```json
+[1, 2, 3]
+```
 
-For example, create `data/users/_userId_.get.yaml` with following rule.
+And on the request `GET /numbers?order=desc`:
+
+```json
+[3, 2, 1]
+```
+
+If the last resort is not defined, the stub will return 404.
+
+
+### Data driven testing
+
+Let's see the example.
+
+Request condition: `path.userId` | Response variable: `tables.userName` | Response variable: `tables.age`
+---------------------------------|--------------------------------------|--------------------------------
+1 | Foo | 35
+2 | Bar | 100
+3 | Baz | 3
+
+Create `/users/_userId_.get.yaml` with following rule.
 
 ```yaml
 - response:
@@ -179,7 +245,7 @@ For example, create `data/users/_userId_.get.yaml` with following rule.
         3: 3
 ```
 
-The stub will serve following body on the request `GET /users/1`:
+The stub will return the following response on the request `GET /users/1`:
 
 ```json
 {
@@ -189,7 +255,7 @@ The stub will serve following body on the request `GET /users/1`:
 }
 ```
 
-And the request `GET /users/2`:
+And on the request `GET /users/2`:
 
 ```json
 {
