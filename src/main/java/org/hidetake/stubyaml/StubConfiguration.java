@@ -43,7 +43,6 @@ public class StubConfiguration {
         val baseDirectory = new File(path);
         if (baseDirectory.isDirectory()) {
             if (!ObjectUtils.isEmpty(baseDirectory.listFiles())) {
-                log.info("Scanning data directory {}", baseDirectory.getAbsolutePath());
                 routeScanner.scan(baseDirectory)
                     .map(routeCompiler::compile)
                     .forEach(route -> {

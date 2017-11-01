@@ -3,11 +3,10 @@ package org.hidetake.stubyaml.model;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.io.FileUtils;
-import org.hidetake.stubyaml.model.yaml.Route;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,20 +20,20 @@ import static java.util.Collections.emptyList;
 public class RuleParser {
     private final Yaml yaml = new Yaml();
 
-    public Route parse(File yamlFile, String requestPath, RequestMethod requestMethod) {
-        return new Route(requestPath, requestMethod, parse(yamlFile));
-    }
-
-    private List<Rule> parse(File yamlFile) {
+    public List<Rule> parse(File yamlFile) {
         try (val yamlStream = FileUtils.openInputStream(yamlFile)) {
             val rules = yaml.loadAs(yamlStream, Rule[].class);
             if (rules == null) {
+                log.warn("No rules found in YAML file {}", yamlFile);
                 return emptyList();
             } else {
                 return asList(rules);
             }
         } catch (IOException e) {
             log.warn("Ignored YAML file {}", yamlFile, e);
+            return emptyList();
+        } catch (YAMLException e) {
+            log.error("Ignored invalid YAML file {}\n{}", yamlFile, e.getLocalizedMessage());
             return emptyList();
         }
     }

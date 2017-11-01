@@ -6,7 +6,6 @@ import lombok.val;
 import org.hidetake.stubyaml.model.yaml.Route;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class RouteScanner {
     private final RuleParser ruleParser;
 
     public Stream<Route> scan(File baseDirectory) throws IOException {
-        log.info("Scanning {}", baseDirectory);
+        log.info("Scanning files in {}", baseDirectory.getAbsolutePath());
         val basePath = baseDirectory.toPath();
         return Files.walk(basePath)
             .filter(path -> path.toFile().isFile())
@@ -45,15 +44,8 @@ public class RouteScanner {
             if (Objects.equals(extension, "yaml")) {
                 log.info("Loading {}", path);
                 return requestMethodOf(requestMethodString)
-                    .map(requestMethod -> {
-                        try {
-                            val route = ruleParser.parse(file, requestPath, requestMethod);
-                            return Stream.of(route);
-                        } catch (YAMLException e) {
-                            log.error("Ignored invalid YAML file {}\n{}", path, e.getLocalizedMessage());
-                            return Stream.<Route>empty();
-                        }
-                    })
+                    .map(requestMethod ->
+                        Stream.of(new Route(requestPath, requestMethod, ruleParser.parse(file))))
                     .orElseGet(() -> {
                         log.error("Ignored invalid request method {} for path {}", requestMethodString, path);
                         return Stream.empty();
