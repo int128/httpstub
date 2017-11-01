@@ -24,7 +24,6 @@ import java.util.stream.StreamSupport;
 @Component
 public class RouteScanner {
     private static final Pattern PATH_PATTERN = Pattern.compile("(.+)\\.(.+?)\\.(.+?)$");
-    private static final Pattern PATH_VARIABLE_PATTERN = Pattern.compile("_(.+?)_");
 
     private final RuleParser ruleParser;
 
@@ -42,7 +41,7 @@ public class RouteScanner {
     private Stream<Route> mapToRoute(String path, File file) {
         val m = PATH_PATTERN.matcher(path);
         if (m.matches()) {
-            val requestPath = replacePathVariables(m.group(1));
+            val requestPath = m.group(1);
             val requestMethodString = m.group(2).toUpperCase();
             val extension = m.group(3);
 
@@ -76,10 +75,6 @@ public class RouteScanner {
         return "/" + StreamSupport.stream(path.spliterator(), false)
             .map(Path::toString)
             .collect(Collectors.joining("/"));
-    }
-
-    private static String replacePathVariables(String path) {
-        return PATH_VARIABLE_PATTERN.matcher(path).replaceAll("{$1}");
     }
 
     private static Optional<RequestMethod> requestMethodOf(String value) {

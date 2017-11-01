@@ -16,7 +16,7 @@ Download the latest JAR from [here](https://github.com/int128/stubyaml/releases)
 
 ```
 mkdir -p data
-vim users.get.yaml
+vim data/users.get.yaml
 ```
 
 Create YAML file `data/users.get.yaml` as following:
@@ -130,13 +130,13 @@ Set the content type header as follows:
 
 ### Path variables
 
-Underscore braced string in file path is treated as a path variable.
-For example, create `/users/_userId_.get.yaml` for handling `/users/1`, `/users/2` and so on.
+A braced string in the file path is treated as a path variable.
+For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
 
 
 ### Groovy template
 
-Header value and body is parsed as a Groovy template.
+Header value and body are parsed as a Groovy template.
 You can access to following objects via the script block `${}`.
 
 Prefix      | Object
@@ -147,7 +147,7 @@ Prefix      | Object
 `params.`   | Request parameters (query string or form)
 `body.`     | Request body
 
-For example, create `/users/_userId_.get.yaml` as following:
+For example, create `/users/{userId}.get.yaml` as following:
 
 ```yaml
 - response:
@@ -218,7 +218,7 @@ Request condition: `path.userId` | Response variable: `tables.userName` | Respon
 2 | Bar | 100
 3 | Baz | 3
 
-Create `/users/_userId_.get.yaml` with following rule.
+Create `/users/{userId}.get.yaml` with following rule.
 
 ```yaml
 - response:
