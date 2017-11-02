@@ -7,6 +7,7 @@ It has following key features:
 - Easy to run and deploy
 - Declarative API definition with YAML
 - Flexible template and pattern matching with Groovy
+- Continuous reload on file change
 
 
 ## Getting Started
@@ -73,6 +74,8 @@ curl -v http://localhost:8080/users
 ]
 * Connection #0 to host localhost left intact
 ```
+
+The stub rescan YAML files if anyone has been changed or new one has been created.
 
 
 ## Configuration

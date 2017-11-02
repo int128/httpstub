@@ -5,58 +5,39 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hidetake.stubyaml.model.RouteCompiler;
-import org.hidetake.stubyaml.model.RouteScanner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class StubConfiguration {
-    @Getter
-    @Setter
-    private String path = "data";
+    @Getter @Setter
+    private String dataDirectory = "data";
 
-    private final RouteScanner routeScanner;
-    private final RouteCompiler routeCompiler;
+    private final RouteRegistrar routeRegistrar;
+    private final RouteWatcher routeWatcher;
 
     @Bean
-    RequestMappingHandlerMapping stubRequestHandlerMapping() throws NoSuchMethodException, IOException {
+    RequestMappingHandlerMapping stubRequestHandlerMapping() throws IOException, InterruptedException {
         val mapping = new RequestMappingHandlerMapping();
         mapping.setOrder(Integer.MAX_VALUE - 2);
 
-        val handleMethod = StubController.class.getMethod("handle",
-            HttpServletRequest.class,
-            Map.class,
-            Map.class,
-            Map.class,
-            Object.class);
+        val baseDirectory = new File(dataDirectory);
+        routeRegistrar.register(mapping, baseDirectory);
+        routeWatcher.runOnFileChangeContinuously(baseDirectory, () -> {
+            log.info("Reload routes after 2 seconds...");
+            Thread.sleep(2000L);
 
-        val baseDirectory = new File(path);
-        if (baseDirectory.isDirectory()) {
-            if (!ObjectUtils.isEmpty(baseDirectory.listFiles())) {
-                routeScanner.scan(baseDirectory)
-                    .map(routeCompiler::compile)
-                    .forEach(route -> {
-                        val requestMappingInfo = route.getRequestMappingInfo();
-                        val controller = new StubController(route);
-                        log.info("Mapping route {}", route);
-                        mapping.registerMapping(requestMappingInfo, controller, handleMethod);
-                    });
-            } else {
-                log.warn("No rule found in {}", baseDirectory.getAbsolutePath());
-            }
-        } else {
-            log.warn("No data directory {}", baseDirectory.getAbsolutePath());
-        }
+            log.info("Reloading routes...");
+            routeRegistrar.unregister(mapping);
+            routeRegistrar.register(mapping, baseDirectory);
+            return null;
+        });
 
         return mapping;
     }

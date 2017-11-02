@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class StubController {
+public class RouteController {
     private final CompiledRoute route;
 
     @ResponseBody
