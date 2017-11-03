@@ -2,10 +2,8 @@ package org.hidetake.stubyaml;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -30,9 +28,7 @@ import java.util.stream.Stream;
  * @see ContentCachingResponseWrapper
  */
 @Slf4j
-@ConditionalOnProperty(value = "no-request-response-log", matchIfMissing = true)
-@Component
-public class StubLoggingFilter extends OncePerRequestFilter {
+public class RequestAndResponseLoggingFilter extends OncePerRequestFilter {
     private static final List<MediaType> VISIBLE_TYPES = Arrays.asList(
         MediaType.valueOf("text/*"),
         MediaType.APPLICATION_FORM_URLENCODED,

@@ -78,19 +78,60 @@ curl -v http://localhost:8080/users
 The stub rescan YAML files if anyone has been changed or new one has been created.
 
 
-## Configuration
+## Options
 
-Suppress request and response log for improving performance.
+### Logging
+
+You can write log to a file.
+
+By following option, the stub writes log to `logs/spring.log`, rotates when it reaches 10MB and keeps up to 8 files.
+See [Spring Boot features: Logging](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-logging.html) for more.
 
 ```
-java -jar stubyaml.jar --no-request-response-log
-```
+# Command line option
+java -jar stubyaml.jar --logging.path=logs
 
-Instead environment variables can be used.
-
-```
-export NO_REQUEST_RESPONSE_LOG=1
+# Environment variable
+export LOGGING_PATH=logs
 java -jar stubyaml.jar
+```
+
+### Request and response logging
+
+You can turn on request and response log as follows:
+
+```
+# Command line option
+java -jar stubyaml.jar --request-response-log
+
+# Environment variable
+export REQUEST_RESPONSE_LOG=1
+java -jar stubyaml.jar
+```
+
+The stub will write request and response log as follows:
+
+```
+2017-11-03 13:46:37.974  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> GET /users
+2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> User-Agent: curl/7.54.0
+2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Accept: */*
+2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Host: 127.0.0.1:8080
+2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|>
+2017-11-03 13:46:38.042  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< 200 OK
+2017-11-03 13:46:38.043  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Length: 83
+2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Date: Fri, 03 Nov 2017 04:46:37 GMT
+2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Type: application/json
+2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<
+2017-11-03 13:46:38.046  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< [
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   {
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "id": 1,
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "name": "Foo"
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   },
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   {
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "id": 2,
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "name": "Bar"
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   }
+2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< ]
 ```
 
 

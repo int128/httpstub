@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -21,6 +22,12 @@ public class StubConfiguration {
 
     private final RouteRegistrar routeRegistrar;
     private final RouteWatcher routeWatcher;
+
+    @Bean
+    @ConditionalOnProperty(name = "request-response-log")
+    RequestAndResponseLoggingFilter requestAndResponseLoggingFilter() {
+        return new RequestAndResponseLoggingFilter();
+    }
 
     @Bean
     RequestMappingHandlerMapping stubRequestHandlerMapping() throws IOException, InterruptedException {
