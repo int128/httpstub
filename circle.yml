@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8
-    working_directory: ~/gradle-starter
+    working_directory: ~/stubyaml
     steps:
       - checkout
 
@@ -30,7 +30,25 @@ jobs:
           name: Publish
           command: |
             if [ "$CIRCLE_TAG" ]; then
-              ./gradlew bintrayUpload -PbintrayUser="$BINTRAY_USER"
+              ./gradlew bootRepackage
+
+              curl -L -o ~/github-release.tar.bz2 https://github.com/aktau/github-release/releases/download/v0.7.2/linux-amd64-github-release.tar.bz2
+              tar -C ~ -jxf ~/github-release.tar.bz2
+              export PATH=~/bin/linux/amd64:"$PATH"
+
+              github-release release \
+                --user int128 \
+                --repo stubyaml \
+                --tag "$CIRCLE_TAG" \
+                --name "$CIRCLE_TAG" \
+                --description "Released on $(date +%Y-%m-%d)"
+
+              github-release upload \
+                --user int128 \
+                --repo stubyaml \
+                --tag "$CIRCLE_TAG" \
+                --name stubyaml.jar \
+                --file build/libs/stubyaml.jar
             fi
 
 deployment:
