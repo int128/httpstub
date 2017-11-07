@@ -11,7 +11,7 @@ import java.util.Map;
 @Builder
 public class CompiledTable {
     private final String name;
-    private final Expression expression;
+    private final CompiledExpression expression;
     private final Map<String, String> values;
 
     public String lookup(RequestContext requestContext) {

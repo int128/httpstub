@@ -2,12 +2,12 @@ package org.hidetake.stubyaml.model;
 
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
 import org.hidetake.stubyaml.model.execution.CompiledTable;
-import org.hidetake.stubyaml.model.execution.Expression;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.hidetake.stubyaml.model.yaml.Table;
 import org.springframework.stereotype.Component;
@@ -24,8 +24,11 @@ import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.Assert.notNull;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class RuleCompiler {
+    private final ExpressionCompiler expressionCompiler;
+
     public CompiledRule compile(Rule rule) {
         notNull(rule, "rule should not be null");
 
@@ -34,7 +37,7 @@ public class RuleCompiler {
         notNull(response.getHeaders(), "headers should not be null");
 
         return CompiledRule.builder()
-            .when(toExpression(rule.getWhen()))
+            .when(expressionCompiler.compile(rule.getWhen()))
             .status(response.getStatus())
             .headers(response.getHeaders()
                 .entrySet()
@@ -45,7 +48,7 @@ public class RuleCompiler {
             .build();
     }
 
-    private static List<CompiledTable> compileTables(List<Table> tables) {
+    private List<CompiledTable> compileTables(List<Table> tables) {
         return tables.stream()
             .map(table -> {
                 if (!StringUtils.hasText(table.getName())) {
@@ -62,24 +65,12 @@ public class RuleCompiler {
                 }
                 return CompiledTable.builder()
                     .name(table.getName())
-                    .expression(toExpression(table.getKey()))
+                    .expression(expressionCompiler.compile(table.getKey()))
                     .values(table.getValues())
                     .build();
             })
             .filter(Objects::nonNull)
             .collect(toList());
-    }
-
-    private static Expression toExpression(String expression) {
-        if (expression == null) {
-            return null;
-        }
-        try {
-            return Expression.compile(expression);
-        } catch (CompilationFailedException e) {
-            log.warn("Invalid expression {}", expression, e);
-            return null;
-        }
     }
 
     private static Template toTemplate(String expression) {

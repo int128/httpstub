@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @Builder
 public class CompiledRule {
-    private final Expression when;
+    private final CompiledExpression when;
     private final int status;
     private final Map<String, Template> headers;
     private final Template body;
