@@ -1,6 +1,5 @@
 package org.hidetake.stubyaml.model.execution;
 
-import groovy.text.Template;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
@@ -14,8 +13,8 @@ import java.util.Map;
 public class CompiledRule {
     private final CompiledExpression when;
     private final int status;
-    private final Map<String, Template> headers;
-    private final Template body;
+    private final Map<String, CompiledTemplate> headers;
+    private final CompiledTemplate body;
     private final List<CompiledTable> tables;
 
     public boolean matches(RequestContext requestContext) {
@@ -32,13 +31,13 @@ public class CompiledRule {
 
         val builder = ResponseEntity.status(status);
         headers.forEach((headerName, template) -> {
-            val headerValue = template.make(resolvedRequestContext.getBinding()).toString();
+            val headerValue = template.build(resolvedRequestContext);
             builder.header(headerName, headerValue);
         });
         if (body == null) {
             return builder.build();
         } else {
-            return builder.body(body.make(resolvedRequestContext.getBinding()).toString());
+            return builder.body(body.build(resolvedRequestContext));
         }
     }
 }
