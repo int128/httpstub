@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -15,7 +14,7 @@ public class CompiledRule {
     private final int status;
     private final Map<String, CompiledTemplate> headers;
     private final CompiledTemplate body;
-    private final List<CompiledTable> tables;
+    private final CompiledTables tables;
 
     public boolean matches(RequestContext requestContext) {
         if (when == null) {
@@ -27,17 +26,17 @@ public class CompiledRule {
     }
 
     public ResponseEntity createResponseEntity(RequestContext requestContext) {
-        val resolvedRequestContext = ResolvedRequestContext.resolve(tables, requestContext);
+        val binding = tables.resolve(requestContext);
 
         val builder = ResponseEntity.status(status);
         headers.forEach((headerName, template) -> {
-            val headerValue = template.build(resolvedRequestContext);
+            val headerValue = template.build(binding);
             builder.header(headerName, headerValue);
         });
         if (body == null) {
             return builder.build();
         } else {
-            return builder.body(body.build(resolvedRequestContext));
+            return builder.body(body.build(binding));
         }
     }
 }

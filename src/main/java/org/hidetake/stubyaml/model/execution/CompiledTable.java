@@ -11,11 +11,11 @@ import java.util.Map;
 @Builder
 public class CompiledTable {
     private final String name;
-    private final CompiledExpression expression;
+    private final CompiledExpression keyExpression;
     private final Map<String, String> values;
 
-    public String lookup(RequestContext requestContext) {
-        val evaluatedKey = ObjectUtils.nullSafeToString(expression.evaluate(requestContext.getBinding()));
-        return values.get(evaluatedKey);
+    public String find(RequestContext requestContext) {
+        val key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContext.getBinding()));
+        return values.get(key);
     }
 }

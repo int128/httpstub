@@ -8,23 +8,20 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class ResolvedRequestContext {
-    private final Map<String, Object> binding;
+public class CompiledTables {
+    private final List<CompiledTable> tables;
 
-    public static ResolvedRequestContext resolve(
-        List<CompiledTable> tables,
-        RequestContext requestContext
-    ) {
+    public Map<String, Object> resolve(RequestContext requestContext) {
         val tableMap = new HashMap<String, Object>(512);
         tables.forEach(table -> {
             val tableName = table.getName();
-            val tableValue = table.lookup(requestContext);
+            val tableValue = table.find(requestContext);
             tableMap.put(tableName, tableValue);
         });
 
         val binding = new HashMap<String, Object>(512);
         binding.putAll(requestContext.getBinding());
         binding.put("table", tableMap);
-        return new ResolvedRequestContext(binding);
+        return binding;
     }
 }

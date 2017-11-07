@@ -7,9 +7,7 @@ import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Objects;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.Assert.notNull;
 
@@ -35,11 +33,7 @@ public class RuleCompiler {
                 .stream()
                 .collect(toMap(Map.Entry::getKey, entry -> templateCompiler.compile(entry.getValue()))))
             .body(templateCompiler.compile(response.getBody()))
-            .tables(response.getTables()
-                .stream()
-                .map(tableCompiler::compile)
-                .filter(Objects::nonNull)
-                .collect(toList()))
+            .tables(tableCompiler.compile(response.getTables()))
             .build();
     }
 }
