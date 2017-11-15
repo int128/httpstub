@@ -10,6 +10,12 @@ import java.util.Map;
 public class Response {
     private int status = 200;
     private Map<String, String> headers = Collections.emptyMap();
+
+    /**
+     * Response body.
+     * One of {@code null}, {@link String}, {@link Boolean}, {@link Number}, {@link List} or {@link Map}.
+     */
     private Object body = null;
+
     private List<Table> tables = Collections.emptyList();
 }

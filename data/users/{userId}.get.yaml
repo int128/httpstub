@@ -1,12 +1,10 @@
 - response:
     headers:
       content-type: application/json
-    body: |
-      {
-        "id": ${path.userId},
-        "name": "${table.userName}",
-        "age": ${table.age}
-      }
+    body:
+      id: ${path.userId}
+      name: ${table.userName}
+      age: ${table.age}
     tables:
     - name: userName
       key: path.userId

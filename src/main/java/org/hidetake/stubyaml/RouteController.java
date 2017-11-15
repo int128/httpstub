@@ -33,7 +33,7 @@ public class RouteController {
         return route.getRules().stream()
             .filter(rule -> rule.matches(requestContext))
             .findFirst()
-            .map(rule -> rule.createResponseEntity(requestContext))
+            .map(rule -> rule.getResponse().render(requestContext))
             .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(String.format("No rule matched for this route %s", route.getRequestMappingInfo())));
     }

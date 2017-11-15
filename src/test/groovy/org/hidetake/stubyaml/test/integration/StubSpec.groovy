@@ -46,7 +46,7 @@ class StubSpec extends Specification {
 
     def 'POST /users should return a user with placeholder replaced'() {
         when:
-        def users = restTemplate.postForEntity('/users', new User(5, 'Baz'), User)
+        def users = restTemplate.postForEntity('/users', new User(5, 'Baz', 100, true), User)
 
         then:
         users.statusCode == HttpStatus.OK

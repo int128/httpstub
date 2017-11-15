@@ -1,9 +1,7 @@
 - response:
     headers:
       content-type: application/json
-    body: |
-      {
-        "id": ${body.id},
-        "name": "${body.name}",
-        "active": true
-      }
+    body:
+      id: ${body.id}
+      name: ${body.name}
+      active: ${body.active as boolean}
