@@ -33,7 +33,7 @@ public class RuleParser {
             log.warn("Ignored YAML file {}", yamlFile, e);
             return emptyList();
         } catch (YAMLException e) {
-            log.error("Ignored invalid YAML file {}\n{}", yamlFile, e.getLocalizedMessage());
+            log.error("Ignored invalid YAML file {}\n{}", yamlFile, e.toString());
             return emptyList();
         }
     }
