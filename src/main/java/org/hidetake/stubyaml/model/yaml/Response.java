@@ -10,6 +10,6 @@ import java.util.Map;
 public class Response {
     private int status = 200;
     private Map<String, String> headers = Collections.emptyMap();
-    private String body = null;
+    private Object body = null;
     private List<Table> tables = Collections.emptyList();
 }

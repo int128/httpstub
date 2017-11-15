@@ -10,6 +10,7 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.Assert.notNull;
+import static org.springframework.util.ObjectUtils.nullSafeToString;
 
 @RequiredArgsConstructor
 @Component
@@ -32,7 +33,7 @@ public class RuleCompiler {
                 .entrySet()
                 .stream()
                 .collect(toMap(Map.Entry::getKey, entry -> templateCompiler.compile(entry.getValue()))))
-            .body(templateCompiler.compile(response.getBody()))
+            .body(templateCompiler.compile(nullSafeToString(response.getBody())))
             .tables(tableCompiler.compile(response.getTables()))
             .build();
     }

@@ -1,14 +1,10 @@
 - response:
     headers:
       content-type: application/json
-    body: |
-      [
-        {
-          "id": 1,
-          "name": "Foo"
-        },
-        {
-          "id": 2,
-          "name": "Bar"
-        }
-      ]
+    body:
+      - id: 1
+        name: Foo
+        uuid: ${UUID.randomUUID()}
+      - id: 2
+        name: Bar
+        uuid: ${UUID.randomUUID()}
