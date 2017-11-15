@@ -1,0 +1,5 @@
+- response:
+    headers:
+      content-type: application/json
+    body: |
+      ${// this is an invalid syntax in Groovy template}

@@ -1,5 +1,6 @@
 package org.hidetake.stubyaml.model;
 
+import groovy.lang.GroovyRuntimeException;
 import groovy.text.SimpleTemplateEngine;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -17,8 +18,8 @@ public class TemplateCompiler {
         }
         try {
             return new CompiledTemplate(new SimpleTemplateEngine().createTemplate(template));
-        } catch (CompilationFailedException | ClassNotFoundException | IOException e) {
-            log.warn("Invalid expression {}", template, e);
+        } catch (GroovyRuntimeException | ClassNotFoundException | IOException e) {
+            log.warn("Ignored invalid expression {}\n{}", template, e.toString());
             return null;
         }
     }
