@@ -1,14 +1,9 @@
 - response:
     headers:
       content-type: application/json
-    body: |
-      [
-        {
-          "id": 1,
-          "name": "Foo"
-        },
-        {
-          "id": 2,
-          "name": "Bar"
-        }
-      ]
+      x-uuid: ${UUID.randomUUID()}
+    body:
+      - id: 1
+        name: Foo
+      - id: 2
+        name: Bar

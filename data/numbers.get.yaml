@@ -2,19 +2,17 @@
   response:
     headers:
       content-type: application/json
-    body: |
-      [3, 2, 1]
+    body: [3, 2, 1]
 
 - when: params.order == 'asc'
   response:
     headers:
       content-type: application/json
-    body: |
-      [1, 2, 3]
+    body: [1, 2, 3]
 
 - response:
     status: 400
     headers:
       content-type: application/json
-    body: |
-      {error: "require_parameter"}
+    body:
+      error: require_parameter

@@ -26,17 +26,11 @@ Create YAML file `data/users.get.yaml` as following:
 - response:
     headers:
       content-type: application/json
-    body: |
-      [
-        {
-          "id": 1,
-          "name": "Foo"
-        },
-        {
-          "id": 2,
-          "name": "Bar"
-        }
-      ]
+    body:
+      - id: 1
+        name: Foo
+      - id: 2
+        name: Bar
 ```
 
 Run the application:
@@ -45,37 +39,24 @@ Run the application:
 java -jar stubyaml.jar
 ```
 
-Invoke the API:
+Call the API:
 
 ```
 curl -v http://localhost:8080/users
-*   Trying ::1...
-* TCP_NODELAY set
-* Connected to localhost (::1) port 8080 (#0)
 > GET /users HTTP/1.1
 > Host: localhost:8080
-> User-Agent: curl/7.54.0
+> User-Agent: curl/7.47.0
 > Accept: */*
 >
 < HTTP/1.1 200 OK
-< Date: Wed, 01 Nov 2017 00:56:43 GMT
+< Date: Thu, 16 Nov 2017 06:50:13 GMT
 < Content-Type: application/json
-< Content-Length: 83
+< Transfer-Encoding: chunked
 <
-[
-  {
-    "id": 1,
-    "name": "Foo"
-  },
-  {
-    "id": 2,
-    "name": "Bar"
-  }
-]
-* Connection #0 to host localhost left intact
+[{"name":"Foo","id":1},{"name":"Bar","id":2}]
 ```
 
-The stub rescan YAML files if anyone has been changed or new one has been created.
+The stub will reload YAML files if anyone has been changed or new one has been created.
 
 
 ## Options
@@ -112,26 +93,17 @@ java -jar stubyaml.jar
 The stub will write request and response log as follows:
 
 ```
-2017-11-03 13:46:37.974  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> GET /users
-2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> User-Agent: curl/7.54.0
-2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Accept: */*
-2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Host: 127.0.0.1:8080
-2017-11-03 13:46:37.977  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|>
-2017-11-03 13:46:38.042  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< 200 OK
-2017-11-03 13:46:38.043  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Length: 83
-2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Date: Fri, 03 Nov 2017 04:46:37 GMT
-2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Type: application/json
-2017-11-03 13:46:38.044  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<
-2017-11-03 13:46:38.046  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< [
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   {
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "id": 1,
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "name": "Foo"
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   },
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   {
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "id": 2,
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<     "name": "Bar"
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<   }
-2017-11-03 13:46:38.047  INFO 17656 --- [tp1555895711-31] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< ]
+2017-11-16 06:52:36.289  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> GET /users
+2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> User-Agent: curl/7.47.0
+2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Accept: */*
+2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Host: localhost:8080
+2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|>
+2017-11-16 06:52:36.414  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< 200 OK
+2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Date: Thu, 16 Nov 2017 06:52:36 GMT
+2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< x-uuid: 1f7d7e56-f669-474c-83ca-7003352b67f6
+2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Type: application/json
+2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<
+2017-11-16 06:52:36.419  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< [{"name":"Foo","id":1},{"name":"Bar","id":2}]
 ```
 
 
@@ -178,18 +150,18 @@ A braced string in the file path is treated as a path variable.
 For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
 
 
-### Groovy template
+### Using template
 
-Header value and body are parsed as a Groovy template.
-You can access to following objects via the script block `${}`.
+Response header value and body are parsed as a Groovy template.
+Following variables are available in a script block `${}`.
 
-Prefix      | Object
+Variable    | Object
 ------------|-------
-`request.`  | `HttpServletRequest` object bound to current request
-`path.`     | Path variables
-`headers.`  | Request headers
-`params.`   | Request parameters (query string or form)
-`body.`     | Request body
+`request`   | `HttpServletRequest` object bound to current request
+`path`      | Path variables
+`headers`   | Request headers
+`params`    | Request parameters (query string or form)
+`body`      | Request body
 
 For example, create `/users/{userId}.get.yaml` as following:
 
@@ -197,11 +169,9 @@ For example, create `/users/{userId}.get.yaml` as following:
 - response:
     headers:
       content-type: application/json
-    body: |
-      {
-        "id": ${path.userId},
-        "name": "User${path.userId}"
-      }
+    body:
+      id: ${path.userId},
+      name: User${path.userId}
 ```
 
 The stub will return the following response on the request `GET /users/100`:
@@ -226,15 +196,13 @@ Here is the example of `/numbers.get.yaml` as follows:
   response:
     headers:
       content-type: application/json
-    body: |
-      [3, 2, 1]
+    body: [3, 2, 1]
 
 - when: params.order == 'asc'
   response:
     headers:
       content-type: application/json
-    body: |
-      [1, 2, 3]
+    body: [1, 2, 3]
 ```
 
 The stub will return the following response on the request `GET /numbers?order=asc`:
@@ -268,12 +236,10 @@ Create `/users/{userId}.get.yaml` with following rule.
 - response:
     headers:
       content-type: application/json
-    body: |
-      {
-        "id": ${path.userId},
-        "name": "${tables.userName}",
-        "age": ${tables.age}
-      }
+    body:
+      id: ${path.userId}
+      name: ${tables.userName}
+      age: ${tables.age}
     tables:
     - name: userName
       key: path.userId

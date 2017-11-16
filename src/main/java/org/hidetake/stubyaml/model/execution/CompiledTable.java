@@ -12,9 +12,9 @@ import java.util.Map;
 public class CompiledTable {
     private final String name;
     private final CompiledExpression keyExpression;
-    private final Map<String, String> values;
+    private final Map<String, Object> values;
 
-    public String find(RequestContext requestContext) {
+    public Object find(RequestContext requestContext) {
         val key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContext.getBinding()));
         return values.get(key);
     }
