@@ -10,12 +10,13 @@ import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.hidetake.stubyaml.util.MapUtils.mapValue;
+import static org.springframework.util.ObjectUtils.nullSafeToString;
 
 @Data
 @Builder
 public class CompiledResponse {
     private final int status;
-    private final Map<String, CompiledTemplate> headers;
+    private final Map<String, CompiledExpression> headers;
     private final Object body;
     private final CompiledTables tables;
 
@@ -23,8 +24,8 @@ public class CompiledResponse {
         val binding = tables.resolve(requestContext);
 
         val builder = ResponseEntity.status(status);
-        headers.forEach((headerName, template) -> {
-            val headerValue = template.build(binding);
+        headers.forEach((headerName, expression) -> {
+            val headerValue = nullSafeToString(expression.evaluate(binding));
             builder.header(headerName, headerValue);
         });
         if (body == null) {
@@ -35,9 +36,9 @@ public class CompiledResponse {
     }
 
     protected Object renderBody(Object body, Map<String, Object> binding) {
-        if (body instanceof CompiledTemplate) {
-            val template = (CompiledTemplate) body;
-            return template.build(binding);
+        if (body instanceof CompiledExpression) {
+            val expression = (CompiledExpression) body;
+            return expression.evaluate(binding);
         } else if (body instanceof List) {
             val list = (List<?>) body;
             return list.stream().map(e -> renderBody(e, binding)).collect(toList());

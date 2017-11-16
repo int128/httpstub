@@ -16,7 +16,7 @@ public class RuleCompiler {
     public CompiledRule compile(Rule rule) {
         notNull(rule, "rule should not be null");
         return CompiledRule.builder()
-            .when(expressionCompiler.compile(rule.getWhen()))
+            .when(expressionCompiler.compileExpression(rule.getWhen()))
             .response(responseCompiler.compile(rule.getResponse()))
             .build();
     }

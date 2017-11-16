@@ -16,7 +16,7 @@ import static org.springframework.util.Assert.notNull;
 @RequiredArgsConstructor
 @Component
 public class ResponseCompiler {
-    private final TemplateCompiler templateCompiler;
+    private final ExpressionCompiler expressionCompiler;
     private final TableCompiler tableCompiler;
 
     public CompiledResponse compile(Response response) {
@@ -25,7 +25,7 @@ public class ResponseCompiler {
 
         return CompiledResponse.builder()
             .status(response.getStatus())
-            .headers(mapValue(response.getHeaders(), templateCompiler::compile))
+            .headers(mapValue(response.getHeaders(), expressionCompiler::compileTemplate))
             .body(compileBody(response.getBody()))
             .tables(tableCompiler.compile(response.getTables()))
             .build();
@@ -34,7 +34,7 @@ public class ResponseCompiler {
     protected Object compileBody(Object body) {
         if (body instanceof String) {
             val string = (String) body;
-            return templateCompiler.compile(string);
+            return expressionCompiler.compileTemplate(string);
         } else if (body instanceof List) {
             val list = (List<?>) body;
             return list.stream().map(this::compileBody).collect(toList());

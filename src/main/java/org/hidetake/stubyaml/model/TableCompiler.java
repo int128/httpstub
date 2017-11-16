@@ -43,7 +43,7 @@ public class TableCompiler {
         }
         return CompiledTable.builder()
             .name(table.getName())
-            .keyExpression(expressionCompiler.compile(table.getKey()))
+            .keyExpression(expressionCompiler.compileExpression(table.getKey()))
             .values(table.getValues())
             .build();
     }

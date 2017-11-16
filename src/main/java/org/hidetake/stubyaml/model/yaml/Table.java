@@ -8,5 +8,5 @@ import java.util.Map;
 public class Table {
     private String name;
     private String key;
-    private Map<String, String> values;
+    private Map<String, Object> values;
 }
