@@ -36,9 +36,12 @@ public class CompiledResponse {
     }
 
     protected Object renderBody(Object body, Map<String, Object> binding) {
-        if (body instanceof CompiledExpression) {
+        if (body == null || body instanceof Number || body instanceof Boolean) {
+            return body;
+        } else if (body instanceof CompiledExpression) {
             val expression = (CompiledExpression) body;
-            return expression.evaluate(binding);
+            val value = expression.evaluate(binding);
+            return renderBody(value, binding);
         } else if (body instanceof List) {
             val list = (List<?>) body;
             return list.stream().map(e -> renderBody(e, binding)).collect(toList());
@@ -46,7 +49,7 @@ public class CompiledResponse {
             val map = (Map<?, ?>) body;
             return mapValue(map, v -> renderBody(v, binding));
         } else {
-            return body;
+            return body.toString();
         }
     }
 }
