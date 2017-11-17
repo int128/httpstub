@@ -41,7 +41,7 @@ jobs:
                 --repo stubyaml \
                 --tag "$CIRCLE_TAG" \
                 --name "$CIRCLE_TAG" \
-                --description "Released on $(date +%Y-%m-%d)"
+                --description "Released on $(date +%Y-%m-%d)" || true
 
               github-release upload \
                 --user int128 \
