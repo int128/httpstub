@@ -274,3 +274,21 @@ And on the request `GET /users/2`:
   "age": 100
 }
 ```
+
+
+## Delayed response
+
+Use `delay` attribute in milliseconds to simulate network latency.
+
+For example, create `/users.post.yaml` as following:
+
+```yaml
+- response:
+    delay: 500
+    headers:
+      content-type: application/json
+    body:
+      id: 1
+```
+
+Send the request `POST /users` and the stub will return a response after 500 ms.

@@ -1,0 +1,3 @@
+- response:
+    # invalid delay time
+    delay: -1

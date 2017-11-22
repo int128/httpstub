@@ -1,6 +1,7 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledResponse;
 import org.hidetake.stubyaml.model.yaml.Response;
@@ -13,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.hidetake.stubyaml.util.MapUtils.mapValue;
 import static org.springframework.util.Assert.notNull;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ResponseCompiler {
@@ -28,6 +30,7 @@ public class ResponseCompiler {
             .headers(mapValue(response.getHeaders(), expressionCompiler::compileTemplate))
             .body(compileBody(response.getBody()))
             .tables(tableCompiler.compile(response.getTables()))
+            .delay(computeDelay(response))
             .build();
     }
 
@@ -43,6 +46,16 @@ public class ResponseCompiler {
             return mapValue(map, this::compileBody);
         } else {
             return body;
+        }
+    }
+
+    protected long computeDelay(Response response) {
+        val delay = response.getDelay();
+        if (delay >= 0) {
+            return delay;
+        } else {
+            log.warn("Ignored invalid delay {}", delay);
+            return 0;
         }
     }
 }
