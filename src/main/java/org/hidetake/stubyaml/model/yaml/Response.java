@@ -18,4 +18,6 @@ public class Response {
     private Object body = null;
 
     private List<Table> tables = Collections.emptyList();
+
+    private long delay = 0;
 }

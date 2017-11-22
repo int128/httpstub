@@ -19,20 +19,19 @@ public class CompiledResponse {
     private final Map<String, CompiledExpression> headers;
     private final Object body;
     private final CompiledTables tables;
+    private final long delay;
 
     public ResponseEntity render(RequestContext requestContext) {
         val binding = tables.resolve(requestContext);
-
         val builder = ResponseEntity.status(status);
         headers.forEach((headerName, expression) -> {
             val headerValue = nullSafeToString(expression.evaluate(binding));
             builder.header(headerName, headerValue);
         });
-        if (body == null) {
-            return builder.build();
-        } else {
-            return builder.body(renderBody(body, binding));
-        }
+        val renderedBody = renderBody(body, binding);
+
+        waitForDelay();
+        return builder.body(renderedBody);
     }
 
     protected Object renderBody(Object body, Map<String, Object> binding) {
@@ -50,6 +49,16 @@ public class CompiledResponse {
             return mapValue(map, v -> renderBody(v, binding));
         } else {
             return body.toString();
+        }
+    }
+
+    protected void waitForDelay() {
+        if (delay > 0) {
+            try {
+                Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
