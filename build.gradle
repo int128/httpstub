@@ -13,7 +13,6 @@ repositories {
 dependencies {
   compile 'org.yaml:snakeyaml:1.19'
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  compile 'commons-io:commons-io:2.5'
   compile 'org.springframework.boot:spring-boot-starter-web'
   compile 'org.springframework.boot:spring-boot-starter-jetty'
   compile 'org.codehaus.groovy:groovy-all:2.4.12'
