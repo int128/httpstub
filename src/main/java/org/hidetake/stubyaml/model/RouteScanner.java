@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.yaml.Route;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,16 +38,16 @@ public class RouteScanner {
         val m = PATH_PATTERN.matcher(path);
         if (m.matches()) {
             val requestPath = m.group(1);
-            val requestMethodString = m.group(2).toUpperCase();
+            val httpMethodString = m.group(2).toUpperCase();
             val extension = m.group(3);
 
             if (Objects.equals(extension, "yaml")) {
                 log.info("Loading {}", path);
-                return requestMethodOf(requestMethodString)
-                    .map(requestMethod ->
-                        Stream.of(new Route(requestPath, requestMethod, ruleParser.parse(file))))
+                return httpMethodOf(httpMethodString)
+                    .map(httpMethod ->
+                        Stream.of(new Route(httpMethod, requestPath, ruleParser.parse(file))))
                     .orElseGet(() -> {
-                        log.error("Ignored invalid request method {} for path {}", requestMethodString, path);
+                        log.error("Ignored invalid request method {} for path {}", httpMethodString, path);
                         return Stream.empty();
                     });
             } else {
@@ -66,9 +66,9 @@ public class RouteScanner {
             .collect(Collectors.joining("/"));
     }
 
-    private static Optional<RequestMethod> requestMethodOf(String value) {
+    private static Optional<HttpMethod> httpMethodOf(String value) {
         try {
-            return Optional.of(RequestMethod.valueOf(value));
+            return Optional.of(HttpMethod.valueOf(value));
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }

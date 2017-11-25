@@ -30,8 +30,7 @@ repositories {
 dependencies {
   compile 'org.yaml:snakeyaml:1.19'
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  compile 'org.springframework.boot:spring-boot-starter-web'
-  compile 'org.springframework.boot:spring-boot-starter-jetty'
+  compile 'org.springframework.boot:spring-boot-starter-webflux'
   compile 'org.codehaus.groovy:groovy-all:2.4.12'
   compileOnly 'org.projectlombok:lombok:1.16.18'
 

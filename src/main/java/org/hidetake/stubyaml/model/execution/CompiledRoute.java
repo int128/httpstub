@@ -2,13 +2,14 @@ package org.hidetake.stubyaml.model.execution;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
 @Data
 @Builder
 public class CompiledRoute {
-    private final RequestMappingInfo requestMappingInfo;
+    private final HttpMethod httpMethod;
+    private final String requestPath;
     private final List<CompiledRule> rules;
 }

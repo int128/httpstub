@@ -3,7 +3,9 @@ package org.hidetake.stubyaml.model.execution;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +23,9 @@ public class CompiledResponse {
     private final CompiledTables tables;
     private final long delay;
 
-    public ResponseEntity render(RequestContext requestContext) {
+    public Mono<ServerResponse> render(RequestContext requestContext) {
         val binding = tables.resolve(requestContext);
-        val builder = ResponseEntity.status(status);
+        val builder = ServerResponse.status(HttpStatus.valueOf(status));
         headers.forEach((headerName, expression) -> {
             val headerValue = nullSafeToString(expression.evaluate(binding));
             builder.header(headerName, headerValue);
@@ -31,7 +33,7 @@ public class CompiledResponse {
         val renderedBody = renderBody(body, binding);
 
         waitForDelay();
-        return builder.body(renderedBody);
+        return builder.syncBody(renderedBody);
     }
 
     protected Object renderBody(Object body, Map<String, Object> binding) {

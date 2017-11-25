@@ -2,19 +2,22 @@ package org.hidetake.stubyaml;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.RouteScanner;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Map;
+
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import static org.springframework.web.reactive.function.server.ServerResponse.ok;
+import static org.springframework.web.reactive.function.server.ServerResponse.status;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,48 +26,37 @@ public class RouteRegistrar {
     private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
 
-    private static final Method controllerMethod;
-    static {
-        try {
-            controllerMethod = RouteController.class.getMethod("handle",
-                HttpServletRequest.class,
-                Map.class,
-                Map.class,
-                Map.class,
-                Object.class);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public void register(RequestMappingHandlerMapping mapping, File baseDirectory) {
+    public RouterFunction<ServerResponse> register(File baseDirectory) {
         if (baseDirectory.isDirectory()) {
             if (!ObjectUtils.isEmpty(baseDirectory.listFiles())) {
                 try {
-                    routeScanner.scan(baseDirectory)
+                    return routeScanner.scan(baseDirectory)
                         .map(routeCompiler::compile)
-                        .forEach(route -> {
-                            val requestMappingInfo = route.getRequestMappingInfo();
-                            val controller = new RouteController(route);
-                            log.info("Mapping route {}", route);
-                            mapping.registerMapping(requestMappingInfo, controller, controllerMethod);
-                        });
+                        .map(route -> route(
+                            method(route.getHttpMethod()).and(path(route.getRequestPath())),
+                            new RouteHandler(route)))
+                        .reduce(
+                            route(GET("/"), req -> ok().body(Flux.just("OK"), String.class)),
+                            RouterFunction::and);
                 } catch (IOException e) {
                     log.warn("Could not scan directory {}", baseDirectory.getAbsolutePath(), e);
+                    return route(all(), req -> status(HttpStatus.INTERNAL_SERVER_ERROR).syncBody("error"));
                 }
             } else {
                 log.warn("No rule found in {}", baseDirectory.getAbsolutePath());
+                return route(all(), req -> status(HttpStatus.INTERNAL_SERVER_ERROR).syncBody("error"));
             }
         } else {
             log.warn("Not found directory {}", baseDirectory.getAbsolutePath());
+            return route(all(), req -> status(HttpStatus.INTERNAL_SERVER_ERROR).syncBody("error"));
         }
     }
 
-    public void unregister(RequestMappingHandlerMapping mapping) {
-        new ArrayList<>(mapping.getHandlerMethods().keySet())
-            .forEach(requestMappingInfo -> {
-                log.info("Unregistering {}", requestMappingInfo);
-                mapping.unregisterMapping(requestMappingInfo);
-            });
-    }
+//    public void unregister(RequestMappingHandlerMapping mapping) {
+//        new ArrayList<>(mapping.getHandlerMethods().keySet())
+//            .forEach(requestMappingInfo -> {
+//                log.info("Unregistering {}", requestMappingInfo);
+//                mapping.unregisterMapping(requestMappingInfo);
+//            });
+//    }
 }

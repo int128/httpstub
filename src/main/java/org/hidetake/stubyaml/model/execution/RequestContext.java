@@ -4,15 +4,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.val;
+import org.springframework.web.reactive.function.server.ServerRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
 @Builder
 public class RequestContext {
-    private final HttpServletRequest request;
+    private final ServerRequest request;
     private final Map<String, String> requestHeaders;
     private final Map<String, String> pathVariables;
     private final Map<String, String> requestParams;

@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 import java.io.File;
-import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,28 +23,28 @@ public class StubConfiguration {
     private final RouteWatcher routeWatcher;
 
     @Bean
-    @ConditionalOnProperty(name = "request-response-log")
-    RequestAndResponseLoggingFilter requestAndResponseLoggingFilter() {
-        return new RequestAndResponseLoggingFilter();
-    }
-
-    @Bean
-    RequestMappingHandlerMapping stubRequestHandlerMapping() throws IOException, InterruptedException {
-        val mapping = new RequestMappingHandlerMapping();
-        mapping.setOrder(Integer.MAX_VALUE - 2);
-
+    RouterFunction<ServerResponse> routes() {
         val baseDirectory = new File(dataDirectory);
-        routeRegistrar.register(mapping, baseDirectory);
-        routeWatcher.runOnFileChangeContinuously(baseDirectory, () -> {
-            log.info("Reload routes after 2 seconds...");
-            Thread.sleep(2000L);
-
-            log.info("Reloading routes...");
-            routeRegistrar.unregister(mapping);
-            routeRegistrar.register(mapping, baseDirectory);
-            return null;
-        });
-
-        return mapping;
+        return routeRegistrar.register(baseDirectory);
     }
+
+//    @Bean
+//    RequestMappingHandlerMapping stubRequestHandlerMapping() throws IOException, InterruptedException {
+//        val mapping = new RequestMappingHandlerMapping();
+//        mapping.setOrder(Integer.MAX_VALUE - 2);
+//
+//        val baseDirectory = new File(dataDirectory);
+//        routeRegistrar.register(mapping, baseDirectory);
+//        routeWatcher.runOnFileChangeContinuously(baseDirectory, () -> {
+//            log.info("Reload routes after 2 seconds...");
+//            Thread.sleep(2000L);
+//
+//            log.info("Reloading routes...");
+//            routeRegistrar.unregister(mapping);
+//            routeRegistrar.register(mapping, baseDirectory);
+//            return null;
+//        });
+//
+//        return mapping;
+//    }
 }
