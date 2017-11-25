@@ -5,8 +5,8 @@ import org.hidetake.stubyaml.test.integration.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
+import org.springframework.http.*
+import org.springframework.util.LinkedMultiValueMap
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -107,5 +107,26 @@ class StubSpec extends Specification {
 
         then:
         response.statusCode == HttpStatus.NOT_FOUND
+    }
+
+    def 'POST /features/form should return a user with placeholder replaced with form data'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+        def body = new LinkedMultiValueMap()
+        body.add('id', '3')
+        body.add('name', 'Foo')
+        body.add('active', 'true')
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def users = restTemplate.postForEntity('/features/form', request, User)
+
+        then:
+        users.statusCode == HttpStatus.OK
+        users.body.id == 3
+        users.body.name == 'Foo'
+        users.body.description == 'user#3'
+        users.body.active
     }
 }

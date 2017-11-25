@@ -1,0 +1,8 @@
+- response:
+    headers:
+      content-type: application/json
+    body:
+      id: ${params.id}
+      name: ${params.name}
+      description: user#${params.id}
+      active: ${params.active as boolean}
