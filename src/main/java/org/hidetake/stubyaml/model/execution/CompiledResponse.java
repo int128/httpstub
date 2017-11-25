@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,11 @@ public class CompiledResponse {
     private final long delay;
 
     public Mono<ServerResponse> render(RequestContext requestContext) {
+        return renderHeadersAndBody(requestContext)
+            .delayElement(Duration.ofMillis(delay));
+    }
+
+    protected Mono<ServerResponse> renderHeadersAndBody(RequestContext requestContext) {
         val binding = tables.resolve(requestContext);
         val builder = ServerResponse.status(HttpStatus.valueOf(status));
         headers.forEach((headerName, expression) -> {
@@ -31,9 +37,11 @@ public class CompiledResponse {
             builder.header(headerName, headerValue);
         });
         val renderedBody = renderBody(body, binding);
-
-        waitForDelay();
-        return builder.syncBody(renderedBody);
+        if (renderedBody == null) {
+            return builder.build();
+        } else {
+            return builder.syncBody(renderedBody);
+        }
     }
 
     protected Object renderBody(Object body, Map<String, Object> binding) {
@@ -51,16 +59,6 @@ public class CompiledResponse {
             return mapValue(map, v -> renderBody(v, binding));
         } else {
             return body.toString();
-        }
-    }
-
-    protected void waitForDelay() {
-        if (delay > 0) {
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }
