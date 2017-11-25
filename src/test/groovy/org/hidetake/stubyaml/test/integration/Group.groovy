@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml.test.integration.model
+package org.hidetake.stubyaml.test.integration
 
 import groovy.transform.Canonical
 

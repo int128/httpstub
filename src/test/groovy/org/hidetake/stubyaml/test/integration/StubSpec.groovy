@@ -1,7 +1,5 @@
 package org.hidetake.stubyaml.test.integration
 
-import org.hidetake.stubyaml.test.integration.model.Group
-import org.hidetake.stubyaml.test.integration.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -24,6 +22,7 @@ class StubSpec extends Specification {
         users.body.length == 2
         users.body[0] == new User(1, 'Foo')
         users.body[1] == new User(2, 'Bar')
+        !users.headers.getFirst('x-uuid').empty
     }
 
     @Unroll
@@ -93,17 +92,17 @@ class StubSpec extends Specification {
         'desc'  | [3, 2, 1]
     }
 
-    def 'GET /authorities should return 500'() {
+    def 'GET /features/status-code should return 500'() {
         when:
-        def response = restTemplate.getForEntity('/authorities', String)
+        def response = restTemplate.getForEntity('/features/status-code', String)
 
         then:
         response.statusCode == HttpStatus.INTERNAL_SERVER_ERROR
     }
 
-    def 'GET /empty should return 404'() {
+    def 'GET /features/empty-rule should return 404'() {
         when:
-        def response = restTemplate.getForEntity('/empty', String)
+        def response = restTemplate.getForEntity('/features/empty-rule', String)
 
         then:
         response.statusCode == HttpStatus.NOT_FOUND
