@@ -3,6 +3,7 @@ package org.hidetake.stubyaml.test.integration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
 import spock.lang.Specification
@@ -111,6 +112,25 @@ class StubSpec extends Specification {
         order   | body
         'asc'   | [1, 2, 3]
         'desc'  | [3, 2, 1]
+    }
+
+    def 'POST /users/2/photo should accept multipart file upload'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA)
+        def body = new LinkedMultiValueMap()
+        body.add('file', new ClassPathResource('/photo.jpg'))
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def photo = restTemplate.postForEntity('/users/2/photo', request, Photo)
+
+        then:
+        photo.statusCode == HttpStatus.OK
+        !photo.body.id.empty
+        photo.body.user.id == 2
+        photo.body.filename == 'photo.jpg'
+        photo.body.contentType == 'image/jpeg'
     }
 
     def 'GET /features/status-code should return 500'() {

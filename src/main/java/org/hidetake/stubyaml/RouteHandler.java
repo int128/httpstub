@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 
 @Data
 @RequiredArgsConstructor
@@ -47,6 +48,8 @@ public class RouteHandler implements HandlerFunction<ServerResponse> {
         return request.headers().contentType().map(mediaType -> {
             if (APPLICATION_FORM_URLENCODED.includes(mediaType)) {
                 return request.body(BodyExtractors.toFormData()).map(MultiValueMap::toSingleValueMap);
+            } else if (MULTIPART_FORM_DATA.includes(mediaType)) {
+                return request.body(BodyExtractors.toMultipartData()).map(MultiValueMap::toSingleValueMap);
             } else {
                 return request.bodyToMono(MAP_TYPE);
             }
