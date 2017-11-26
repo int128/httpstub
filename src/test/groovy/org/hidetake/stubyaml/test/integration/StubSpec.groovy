@@ -43,7 +43,7 @@ class StubSpec extends Specification {
         3  | 'Baz'  | 3
     }
 
-    def 'POST /users should return a user with placeholder replaced'() {
+    def 'POST /users should return a user with placeholder replaced with JSON data'() {
         when:
         def users = restTemplate.postForEntity('/users', new User(5, 'Baz', null, 100, true), User)
 
@@ -52,6 +52,27 @@ class StubSpec extends Specification {
         users.body.id == 5
         users.body.name == 'Baz'
         users.body.description == 'user#5'
+        users.body.active
+    }
+
+    def 'POST /users should return a user with placeholder replaced with form data'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+        def body = new LinkedMultiValueMap()
+        body.add('id', '3')
+        body.add('name', 'Foo')
+        body.add('active', 'true')
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def users = restTemplate.postForEntity('/users', request, User)
+
+        then:
+        users.statusCode == HttpStatus.OK
+        users.body.id == 3
+        users.body.name == 'Foo'
+        users.body.description == 'user#3'
         users.body.active
     }
 
@@ -106,26 +127,5 @@ class StubSpec extends Specification {
 
         then:
         response.statusCode == HttpStatus.NOT_FOUND
-    }
-
-    def 'POST /features/form should return a user with placeholder replaced with form data'() {
-        given:
-        def headers = new HttpHeaders()
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
-        def body = new LinkedMultiValueMap()
-        body.add('id', '3')
-        body.add('name', 'Foo')
-        body.add('active', 'true')
-        def request = new HttpEntity(body, headers)
-
-        when:
-        def users = restTemplate.postForEntity('/features/form', request, User)
-
-        then:
-        users.statusCode == HttpStatus.OK
-        users.body.id == 3
-        users.body.name == 'Foo'
-        users.body.description == 'user#3'
-        users.body.active
     }
 }
