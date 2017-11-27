@@ -1,43 +1,45 @@
-package org.hidetake.stubyaml;
+package org.hidetake.stubyaml.app;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.RouteScanner;
+import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.reactive.function.server.RequestPredicate;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
-import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 import static org.springframework.web.reactive.function.server.ServerResponse.status;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class RouteRegistrar {
+    private final ReloadableHttpHandler reloadableHttpHandler;
     private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
 
-    public RouterFunction<ServerResponse> register(File baseDirectory) {
+    public void register(File baseDirectory) {
+        reloadableHttpHandler.reload(scan(baseDirectory));
+    }
+
+    public RouterFunction<ServerResponse> scan(File baseDirectory) {
         if (baseDirectory.isDirectory()) {
             if (!ObjectUtils.isEmpty(baseDirectory.listFiles())) {
                 try {
                     return routeScanner.scan(baseDirectory)
                         .map(routeCompiler::compile)
-                        .map(route -> route(
-                            method(route.getHttpMethod()).and(path(route.getRequestPath())),
-                            new RouteHandler(route)))
-                        .reduce(
-                            route(GET("/"), req -> ok().body(Flux.just("OK"), String.class)),
-                            RouterFunction::and);
+                        .map(route -> route(predicate(route), new RouteHandler(route)))
+                        .reduce(RouterFunction::and)
+                        .orElseGet(() -> route(all(), req -> status(HttpStatus.INTERNAL_SERVER_ERROR).syncBody("error")));
                 } catch (IOException e) {
                     log.warn("Could not scan directory {}", baseDirectory.getAbsolutePath(), e);
                     return route(all(), req -> status(HttpStatus.INTERNAL_SERVER_ERROR).syncBody("error"));
@@ -52,11 +54,7 @@ public class RouteRegistrar {
         }
     }
 
-//    public void unregister(RequestMappingHandlerMapping mapping) {
-//        new ArrayList<>(mapping.getHandlerMethods().keySet())
-//            .forEach(requestMappingInfo -> {
-//                log.info("Unregistering {}", requestMappingInfo);
-//                mapping.unregisterMapping(requestMappingInfo);
-//            });
-//    }
+    private static RequestPredicate predicate(CompiledRoute route) {
+        return method(route.getHttpMethod()).and(path(route.getRequestPath()));
+    }
 }

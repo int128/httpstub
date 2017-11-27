@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml;
+package org.hidetake.stubyaml.app;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
