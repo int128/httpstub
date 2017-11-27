@@ -1,0 +1,10 @@
+- response:
+    headers:
+      content-type: text/plain
+    body: |-
+      ${switch (body) {
+        case null: return 'null'
+        case Map: return 'Map'
+        case List: return 'List'
+        default: return body.class.simpleName
+      }}

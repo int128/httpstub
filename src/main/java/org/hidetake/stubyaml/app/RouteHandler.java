@@ -1,34 +1,36 @@
 package org.hidetake.stubyaml.app;
 
-import lombok.Data;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.hidetake.stubyaml.model.execution.RequestContext;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractors;
-import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.Map;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
+import static org.springframework.http.MediaType.*;
 
-@Data
 @RequiredArgsConstructor
-public class RouteHandler implements HandlerFunction<ServerResponse> {
+@Component
+public class RouteHandler {
     private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
         new ParameterizedTypeReference<Map<String, Object>>() {};
 
-    private final CompiledRoute route;
+    private static final MediaType TEXT_ALL = MediaType.valueOf("text/*");
 
-    public Mono<ServerResponse> handle(ServerRequest request) {
+    private final XmlMapper xmlMapper = new XmlMapper();
+
+    public Mono<ServerResponse> handle(CompiledRoute route, ServerRequest request) {
         val requestContextBuilder = RequestContext.builder()
-            .request(request)
             .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())
             .pathVariables(request.pathVariables())
             .requestParams(request.queryParams().toSingleValueMap());
@@ -44,16 +46,40 @@ public class RouteHandler implements HandlerFunction<ServerResponse> {
                     .orElseGet(() -> ServerResponse.notFound().build()));
     }
 
-    private Mono<?> extractBody(ServerRequest request) {
+    public Mono<?> extractBody(ServerRequest request) {
         return request.headers().contentType().map(mediaType -> {
             if (APPLICATION_FORM_URLENCODED.includes(mediaType)) {
                 return request.body(BodyExtractors.toFormData()).map(MultiValueMap::toSingleValueMap);
             } else if (MULTIPART_FORM_DATA.includes(mediaType)) {
                 return request.body(BodyExtractors.toMultipartData()).map(MultiValueMap::toSingleValueMap);
-            } else {
+            } else if (APPLICATION_JSON.includes(mediaType)) {
                 return request.bodyToMono(MAP_TYPE);
+            } else if (APPLICATION_XML.includes(mediaType)) {
+                return extractBodyAsXml(request);
+            } else if (TEXT_ALL.includes(mediaType)) {
+                return extractBodyAsString(request);
+            } else {
+                return extractBodyAsBytes(request);
             }
-        }).orElseGet(() ->
-            request.bodyToMono(MAP_TYPE));
+        }).orElseGet(() -> extractBodyAsBytes(request));
+    }
+
+    public Mono<String> extractBodyAsString(ServerRequest request) {
+        return request.bodyToMono(String.class);
+    }
+
+    public Mono<Map> extractBodyAsXml(ServerRequest request) {
+        return extractBodyAsString(request).map(body -> {
+            try {
+                return xmlMapper.readValue(body, Map.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public Mono<Void> extractBodyAsBytes(ServerRequest request) {
+        // TODO: provide bytes to script
+        return Mono.empty();
     }
 }

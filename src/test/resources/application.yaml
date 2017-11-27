@@ -1,3 +1,7 @@
 logging:
   level:
+    # RestTemplate headers and body
     org.apache.http.wire: DEBUG
+    # WebTestClient headers and body
+    reactor.ipc.netty.channel.ChannelOperationsHandler: DEBUG
+    reactor.ipc.netty.http.client.HttpClient: DEBUG
