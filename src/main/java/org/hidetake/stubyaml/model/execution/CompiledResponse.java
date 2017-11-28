@@ -3,11 +3,9 @@ package org.hidetake.stubyaml.model.execution;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
+import org.hidetake.stubyaml.util.MapUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -24,39 +22,32 @@ public class CompiledResponse {
     private final CompiledTables tables;
     private final long delay;
 
-    public Mono<ServerResponse> render(RequestContext requestContext) {
-        return renderHeadersAndBody(requestContext)
-            .delayElement(Duration.ofMillis(delay));
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.valueOf(status);
     }
 
-    protected Mono<ServerResponse> renderHeadersAndBody(RequestContext requestContext) {
-        val binding = tables.resolve(requestContext);
-        val builder = ServerResponse.status(HttpStatus.valueOf(status));
-        headers.forEach((headerName, expression) -> {
-            val headerValue = nullSafeToString(expression.evaluate(binding));
-            builder.header(headerName, headerValue);
-        });
-        val renderedBody = renderBody(body, binding);
-        if (renderedBody == null) {
-            return builder.build();
-        } else {
-            return builder.syncBody(renderedBody);
-        }
+    public Map<String, String> renderHeaders(ResponseContextMap responseContextMap) {
+        return MapUtils.mapValue(headers, expression ->
+            nullSafeToString(expression.evaluate(responseContextMap)));
     }
 
-    protected Object renderBody(Object body, Map<String, Object> binding) {
+    public Object renderBody(ResponseContextMap responseContextMap) {
+        return renderNestedBody(body, responseContextMap);
+    }
+
+    private static Object renderNestedBody(Object body, ResponseContextMap responseContextMap) {
         if (body == null || body instanceof Number || body instanceof Boolean) {
             return body;
         } else if (body instanceof CompiledExpression) {
             val expression = (CompiledExpression) body;
-            val value = expression.evaluate(binding);
-            return renderBody(value, binding);
+            val value = expression.evaluate(responseContextMap);
+            return renderNestedBody(value, responseContextMap);
         } else if (body instanceof List) {
             val list = (List<?>) body;
-            return list.stream().map(e -> renderBody(e, binding)).collect(toList());
+            return list.stream().map(e -> renderNestedBody(e, responseContextMap)).collect(toList());
         } else if (body instanceof Map) {
             val map = (Map<?, ?>) body;
-            return mapValue(map, v -> renderBody(v, binding));
+            return mapValue(map, v -> renderNestedBody(v, responseContextMap));
         } else {
             return body.toString();
         }
