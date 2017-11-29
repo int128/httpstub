@@ -1,0 +1,10 @@
+- response:
+    delay: 500
+    headers:
+      content-type: application/json
+    body:
+      id: ${UUID.randomUUID()}
+      filename: ${body.file.filename()}
+      contentType: ${body.file.headers().getContentType()}
+      user:
+        id: ${path.userId}

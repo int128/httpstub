@@ -3,7 +3,8 @@ package org.hidetake.stubyaml.model.execution;
 import lombok.Builder;
 import lombok.Data;
 import lombok.val;
-import org.springframework.http.ResponseEntity;
+import org.hidetake.stubyaml.util.MapUtils;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -21,44 +22,34 @@ public class CompiledResponse {
     private final CompiledTables tables;
     private final long delay;
 
-    public ResponseEntity render(RequestContext requestContext) {
-        val binding = tables.resolve(requestContext);
-        val builder = ResponseEntity.status(status);
-        headers.forEach((headerName, expression) -> {
-            val headerValue = nullSafeToString(expression.evaluate(binding));
-            builder.header(headerName, headerValue);
-        });
-        val renderedBody = renderBody(body, binding);
-
-        waitForDelay();
-        return builder.body(renderedBody);
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.valueOf(status);
     }
 
-    protected Object renderBody(Object body, Map<String, Object> binding) {
+    public Map<String, String> renderHeaders(ResponseContextMap responseContextMap) {
+        return MapUtils.mapValue(headers, expression ->
+            nullSafeToString(expression.evaluate(responseContextMap)));
+    }
+
+    public Object renderBody(ResponseContextMap responseContextMap) {
+        return renderNestedBody(body, responseContextMap);
+    }
+
+    private static Object renderNestedBody(Object body, ResponseContextMap responseContextMap) {
         if (body == null || body instanceof Number || body instanceof Boolean) {
             return body;
         } else if (body instanceof CompiledExpression) {
             val expression = (CompiledExpression) body;
-            val value = expression.evaluate(binding);
-            return renderBody(value, binding);
+            val value = expression.evaluate(responseContextMap);
+            return renderNestedBody(value, responseContextMap);
         } else if (body instanceof List) {
             val list = (List<?>) body;
-            return list.stream().map(e -> renderBody(e, binding)).collect(toList());
+            return list.stream().map(e -> renderNestedBody(e, responseContextMap)).collect(toList());
         } else if (body instanceof Map) {
             val map = (Map<?, ?>) body;
-            return mapValue(map, v -> renderBody(v, binding));
+            return mapValue(map, v -> renderNestedBody(v, responseContextMap));
         } else {
             return body.toString();
-        }
-    }
-
-    protected void waitForDelay() {
-        if (delay > 0) {
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

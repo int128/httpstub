@@ -157,11 +157,21 @@ Following variables are available in a script block `${}`.
 
 Variable    | Object
 ------------|-------
-`request`   | `HttpServletRequest` object bound to current request
 `path`      | Path variables
 `headers`   | Request headers
-`params`    | Request parameters (query string or form)
+`params`    | Query parameters
 `body`      | Request body
+
+Type of the request body may be one of following:
+
+Content type of request | Type of request body
+------------------------|---------------------
+`application/x-www-form-urlencoded` | `Map<String, String>`
+`multipart/form-data` | `Map<String, Part>`
+`application/json` and subset | `Map<String, Object>`
+`application/xml` and subset | `Map<String, Object>`
+`text/*` | `String`
+Otherwise | `null`
 
 For example, create `/users/{userId}.get.yaml` as following:
 

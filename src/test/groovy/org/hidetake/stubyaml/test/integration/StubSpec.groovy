@@ -3,6 +3,7 @@ package org.hidetake.stubyaml.test.integration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.*
 import org.springframework.util.LinkedMultiValueMap
 import spock.lang.Specification
@@ -43,7 +44,7 @@ class StubSpec extends Specification {
         3  | 'Baz'  | 3
     }
 
-    def 'POST /users should return a user with placeholder replaced'() {
+    def 'POST /users should return a user with placeholder replaced with JSON data'() {
         when:
         def users = restTemplate.postForEntity('/users', new User(5, 'Baz', null, 100, true), User)
 
@@ -52,6 +53,27 @@ class StubSpec extends Specification {
         users.body.id == 5
         users.body.name == 'Baz'
         users.body.description == 'user#5'
+        users.body.active
+    }
+
+    def 'POST /users should return a user with placeholder replaced with form data'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
+        def body = new LinkedMultiValueMap()
+        body.add('id', '3')
+        body.add('name', 'Foo')
+        body.add('active', 'true')
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def users = restTemplate.postForEntity('/users', request, User)
+
+        then:
+        users.statusCode == HttpStatus.OK
+        users.body.id == 3
+        users.body.name == 'Foo'
+        users.body.description == 'user#3'
         users.body.active
     }
 
@@ -92,6 +114,25 @@ class StubSpec extends Specification {
         'desc'  | [3, 2, 1]
     }
 
+    def 'POST /users/2/photo should accept multipart file upload'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA)
+        def body = new LinkedMultiValueMap()
+        body.add('file', new ClassPathResource('/photo.jpg'))
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def photo = restTemplate.postForEntity('/users/2/photo', request, Photo)
+
+        then:
+        photo.statusCode == HttpStatus.OK
+        !photo.body.id.empty
+        photo.body.user.id == 2
+        photo.body.filename == 'photo.jpg'
+        photo.body.contentType == 'image/jpeg'
+    }
+
     def 'GET /features/status-code should return 500'() {
         when:
         def response = restTemplate.getForEntity('/features/status-code', String)
@@ -106,26 +147,5 @@ class StubSpec extends Specification {
 
         then:
         response.statusCode == HttpStatus.NOT_FOUND
-    }
-
-    def 'POST /features/form should return a user with placeholder replaced with form data'() {
-        given:
-        def headers = new HttpHeaders()
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED)
-        def body = new LinkedMultiValueMap()
-        body.add('id', '3')
-        body.add('name', 'Foo')
-        body.add('active', 'true')
-        def request = new HttpEntity(body, headers)
-
-        when:
-        def users = restTemplate.postForEntity('/features/form', request, User)
-
-        then:
-        users.statusCode == HttpStatus.OK
-        users.body.id == 3
-        users.body.name == 'Foo'
-        users.body.description == 'user#3'
-        users.body.active
     }
 }

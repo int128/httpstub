@@ -12,7 +12,7 @@ class ExpressionCompilerSpec extends Specification {
         def compiledExpression = expressionCompiler.compileTemplate(template)
 
         then:
-        compiledExpression?.evaluate([:]) == value
+        compiledExpression?.evaluate {[:]} == value
 
         where:
         template            | value

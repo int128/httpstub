@@ -2,13 +2,20 @@ package org.hidetake.stubyaml.model.execution;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.reactive.function.server.RequestPredicate;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
 public class CompiledRoute {
-    private final RequestMappingInfo requestMappingInfo;
+    private final RequestPredicate requestPredicate;
     private final List<CompiledRule> rules;
+
+    public Optional<CompiledRule> findRule(RequestContextMap requestContextMap) {
+        return rules.stream()
+            .filter(rule -> rule.matches(requestContextMap))
+            .findFirst();
+    }
 }
