@@ -1,15 +1,23 @@
 package org.hidetake.stubyaml.model.execution;
 
+import groovy.lang.Binding;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.val;
 
 @Data
-public class ResponseContext {
+@Builder
+public class ResponseContext implements Bindable {
     private final RequestContext requestContext;
     private final ResolvedTable resolvedTable;
 
-    public static ResponseContext of(CompiledResponse compiledResponse, RequestContext requestContext) {
-        return new ResponseContext(requestContext,
-            compiledResponse.getTables().resolve(
-                RequestContextMap.of(requestContext)));
+    @Getter(lazy = true)
+    private final Binding binding = createBinding();
+
+    Binding createBinding() {
+        val binding = requestContext.createBinding();
+        binding.setVariable("table", resolvedTable.getMap());
+        return binding;
     }
 }

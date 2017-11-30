@@ -26,28 +26,28 @@ public class CompiledResponse {
         return HttpStatus.valueOf(status);
     }
 
-    public Map<String, String> renderHeaders(ResponseContextMap responseContextMap) {
+    public Map<String, String> renderHeaders(ResponseContext responseContext) {
         return MapUtils.mapValue(headers, expression ->
-            nullSafeToString(expression.evaluate(responseContextMap)));
+            nullSafeToString(expression.evaluate(responseContext)));
     }
 
-    public Object renderBody(ResponseContextMap responseContextMap) {
-        return renderNestedBody(body, responseContextMap);
+    public Object renderBody(ResponseContext responseContext) {
+        return renderNestedBody(body, responseContext);
     }
 
-    private static Object renderNestedBody(Object body, ResponseContextMap responseContextMap) {
+    private static Object renderNestedBody(Object body, ResponseContext responseContext) {
         if (body == null || body instanceof Number || body instanceof Boolean) {
             return body;
         } else if (body instanceof CompiledExpression) {
             val expression = (CompiledExpression) body;
-            val value = expression.evaluate(responseContextMap);
-            return renderNestedBody(value, responseContextMap);
+            val value = expression.evaluate(responseContext);
+            return renderNestedBody(value, responseContext);
         } else if (body instanceof List) {
             val list = (List<?>) body;
-            return list.stream().map(e -> renderNestedBody(e, responseContextMap)).collect(toList());
+            return list.stream().map(e -> renderNestedBody(e, responseContext)).collect(toList());
         } else if (body instanceof Map) {
             val map = (Map<?, ?>) body;
-            return mapValue(map, v -> renderNestedBody(v, responseContextMap));
+            return mapValue(map, v -> renderNestedBody(v, responseContext));
         } else {
             return body.toString();
         }

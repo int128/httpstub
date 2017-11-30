@@ -4,7 +4,10 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hidetake.stubyaml.model.execution.*;
+import org.hidetake.stubyaml.model.execution.CompiledResponse;
+import org.hidetake.stubyaml.model.execution.CompiledRoute;
+import org.hidetake.stubyaml.model.execution.RequestContext;
+import org.hidetake.stubyaml.model.execution.ResponseContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -47,7 +50,7 @@ public class RouteHandler {
             })
             .switchIfEmpty(Mono.just(requestContextBuilder.build()))
             .flatMap(requestContext ->
-                route.findRule(RequestContextMap.of(requestContext))
+                route.findRule(requestContext)
                     .map(rule -> render(rule.getResponse(), requestContext))
                     .orElseGet(() -> ServerResponse.notFound().build()));
     }
@@ -77,15 +80,17 @@ public class RouteHandler {
 
     protected Mono<ServerResponse> renderHeadersAndBody(CompiledResponse compiledResponse, RequestContext requestContext) {
         val httpStatus = compiledResponse.getHttpStatus();
-        val responseContext = ResponseContext.of(compiledResponse, requestContext);
-        val responseContextMap = ResponseContextMap.of(responseContext);
-        val headers = compiledResponse.renderHeaders(responseContextMap);
+        val responseContext = ResponseContext.builder()
+            .requestContext(requestContext)
+            .resolvedTable(compiledResponse.getTables().resolve(requestContext))
+            .build();
+        val headers = compiledResponse.renderHeaders(responseContext);
 
         val builder = ServerResponse.status(httpStatus);
         headers.forEach(builder::header);
         requestResponseLogger.logResponseHeaders(httpStatus, headers);
 
-        val renderedBody = compiledResponse.renderBody(responseContextMap);
+        val renderedBody = compiledResponse.renderBody(responseContext);
         if (renderedBody == null) {
             return builder.build();
         } else {

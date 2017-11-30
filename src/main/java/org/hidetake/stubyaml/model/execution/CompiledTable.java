@@ -14,8 +14,8 @@ public class CompiledTable {
     private final CompiledExpression keyExpression;
     private final Map<String, Object> values;
 
-    public Object find(RequestContextMap requestContextMap) {
-        val key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContextMap));
+    public Object find(RequestContext requestContext) {
+        val key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContext));
         return values.get(key);
     }
 }
