@@ -143,6 +143,15 @@ Set the content type header as follows:
       </users>
 ```
 
+Set the character set if needed:
+
+```yaml
+- response:
+    headers:
+      content-type: text/plain;charset=Shift_JIS
+    body: Example
+```
+
 
 ### Path variables
 
