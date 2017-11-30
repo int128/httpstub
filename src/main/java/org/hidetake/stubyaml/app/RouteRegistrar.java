@@ -27,13 +27,13 @@ import static org.springframework.web.reactive.function.server.ServerResponse.st
 @RequiredArgsConstructor
 @Component
 public class RouteRegistrar {
-    private final ReloadableHttpHandler reloadableHttpHandler;
+    private final ReloadableRouter reloadableRouter;
     private final RouteScanner routeScanner;
     private final RouteCompiler routeCompiler;
     private final RouteHandler routeHandler;
 
     public void register(File baseDirectory) {
-        reloadableHttpHandler.reload(generateRouterFunction(baseDirectory));
+        reloadableRouter.reload(generateRouterFunction(baseDirectory));
     }
 
     private RouterFunction<ServerResponse> generateRouterFunction(File baseDirectory) {
