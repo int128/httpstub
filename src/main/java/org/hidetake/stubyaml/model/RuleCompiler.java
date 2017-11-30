@@ -2,6 +2,7 @@ package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
+import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,11 @@ public class RuleCompiler {
     private final ExpressionCompiler expressionCompiler;
     private final ResponseCompiler responseCompiler;
 
-    public CompiledRule compile(Rule rule) {
+    public CompiledRule compile(RouteSource source, Rule rule) {
         notNull(rule, "rule should not be null");
         return CompiledRule.builder()
             .when(expressionCompiler.compileExpression(rule.getWhen()))
-            .response(responseCompiler.compile(rule.getResponse()))
+            .response(responseCompiler.compile(source, rule.getResponse()))
             .build();
     }
 }

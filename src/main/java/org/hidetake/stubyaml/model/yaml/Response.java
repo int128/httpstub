@@ -16,6 +16,7 @@ public class Response {
      * One of {@code null}, {@link String}, {@link Boolean}, {@link Number}, {@link List} or {@link Map}.
      */
     private Object body = null;
+    private String file = null;
 
     private List<Table> tables = Collections.emptyList();
 
