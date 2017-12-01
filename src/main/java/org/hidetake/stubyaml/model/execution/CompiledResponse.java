@@ -2,15 +2,12 @@ package org.hidetake.stubyaml.model.execution;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.val;
 import org.hidetake.stubyaml.util.MapUtils;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
+import java.time.Duration;
 import java.util.Map;
 
-import static java.util.stream.Collectors.toList;
-import static org.hidetake.stubyaml.util.MapUtils.mapValue;
 import static org.springframework.util.ObjectUtils.nullSafeToString;
 
 @Data
@@ -18,38 +15,16 @@ import static org.springframework.util.ObjectUtils.nullSafeToString;
 public class CompiledResponse {
     private final int status;
     private final Map<String, CompiledExpression> headers;
-    private final Object body;
+    private final CompiledResponseBody body;
     private final CompiledTables tables;
-    private final long delay;
+    private final Duration delay;
 
     public HttpStatus getHttpStatus() {
         return HttpStatus.valueOf(status);
     }
 
-    public Map<String, String> renderHeaders(ResponseContext responseContext) {
+    public Map<String, String> evaluateHeaders(ResponseContext responseContext) {
         return MapUtils.mapValue(headers, expression ->
             nullSafeToString(expression.evaluate(responseContext)));
-    }
-
-    public Object renderBody(ResponseContext responseContext) {
-        return renderNestedBody(body, responseContext);
-    }
-
-    private static Object renderNestedBody(Object body, ResponseContext responseContext) {
-        if (body == null || body instanceof Number || body instanceof Boolean) {
-            return body;
-        } else if (body instanceof CompiledExpression) {
-            val expression = (CompiledExpression) body;
-            val value = expression.evaluate(responseContext);
-            return renderNestedBody(value, responseContext);
-        } else if (body instanceof List) {
-            val list = (List<?>) body;
-            return list.stream().map(e -> renderNestedBody(e, responseContext)).collect(toList());
-        } else if (body instanceof Map) {
-            val map = (Map<?, ?>) body;
-            return mapValue(map, v -> renderNestedBody(v, responseContext));
-        } else {
-            return body.toString();
-        }
     }
 }

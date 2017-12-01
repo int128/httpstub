@@ -152,6 +152,15 @@ Set the character set if needed:
     body: Example
 ```
 
+You can specify a `file` instead of `body` as follows:
+
+```yaml
+- response:
+    headers:
+      content-type: image/jpeg
+    file: photo.jpg
+```
+
 
 ### Path variables
 

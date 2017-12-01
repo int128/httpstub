@@ -2,7 +2,7 @@ package org.hidetake.stubyaml.test.integration
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.FileSystemResource
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.util.LinkedMultiValueMap
@@ -15,8 +15,9 @@ class RequestBodySpec extends Specification {
 
     def 'Request body should be a Map if it is multipart/form-data'() {
         given:
+        def image = new FileSystemResource('data/users/{userId}/photo.jpg')
         def requestBody = new LinkedMultiValueMap()
-        requestBody.add('file', new ClassPathResource('/photo.jpg'))
+        requestBody.add('file', image)
 
         when:
         def response = client.post()
@@ -103,12 +104,12 @@ class RequestBodySpec extends Specification {
 
     def 'Request body should be null if it is image/jpeg'() {
         given:
-        def requestBody = new ClassPathResource('/photo.jpg')
+        def image = new FileSystemResource('data/users/{userId}/photo.jpg')
 
         when:
         def response = client.post()
             .uri('/features/request-body-type')
-            .body(BodyInserters.fromResource(requestBody))
+            .body(BodyInserters.fromResource(image))
             .exchange()
 
         then:
