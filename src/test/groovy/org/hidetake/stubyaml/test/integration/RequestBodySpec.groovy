@@ -7,10 +7,15 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
+import reactor.core.publisher.Mono
 import spock.lang.Specification
+
+import java.nio.charset.Charset
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RequestBodySpec extends Specification {
+    static final SHIFT_JIS_CHARSET = Charset.forName('Shift_JIS')
+
     @Autowired WebTestClient client
 
     def 'Request body should be a Map if it is multipart/form-data'() {
@@ -65,6 +70,23 @@ class RequestBodySpec extends Specification {
         response.expectBody(String).isEqualTo('Map')
     }
 
+    def 'Request body should be a Map if it is application/json and charset is not UTF-8'() {
+        given:
+        def requestBody = '{"name":"あいうえお"}'.getBytes(SHIFT_JIS_CHARSET)
+
+        when:
+        def response = client.post()
+            .uri('/features/request-body-type')
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, SHIFT_JIS_CHARSET))
+            .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
+            .exchange()
+
+        then:
+        response.expectStatus().isOk()
+        response.expectHeader().contentType(MediaType.TEXT_PLAIN)
+        response.expectBody(String).isEqualTo('Map')
+    }
+
     def 'Request body should be a Map if it is application/xml'() {
         given:
         def requestBody = '''\
@@ -77,6 +99,23 @@ class RequestBodySpec extends Specification {
             .uri('/features/request-body-type')
             .contentType(MediaType.APPLICATION_XML)
             .body(BodyInserters.fromObject(requestBody))
+            .exchange()
+
+        then:
+        response.expectStatus().isOk()
+        response.expectHeader().contentType(MediaType.TEXT_PLAIN)
+        response.expectBody(String).isEqualTo('Map')
+    }
+
+    def 'Request body should be a Map if it is application/xml and charset is not UTF-8'() {
+        given:
+        def requestBody = '<name>あいうえお</name>'.getBytes(SHIFT_JIS_CHARSET)
+
+        when:
+        def response = client.post()
+            .uri('/features/request-body-type')
+            .contentType(new MediaType(MediaType.APPLICATION_XML, SHIFT_JIS_CHARSET))
+            .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
             .exchange()
 
         then:

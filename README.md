@@ -143,7 +143,7 @@ Set the content type header as follows:
       </users>
 ```
 
-Set the character set if needed:
+Set the character set for response body if needed:
 
 ```yaml
 - response:

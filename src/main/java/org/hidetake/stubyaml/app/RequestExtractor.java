@@ -1,8 +1,9 @@
 package org.hidetake.stubyaml.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import lombok.RequiredArgsConstructor;
 import org.hidetake.stubyaml.model.execution.RequestContext;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -15,12 +16,12 @@ import java.util.Map;
 
 import static org.springframework.http.MediaType.*;
 
+@RequiredArgsConstructor
 @Component
 public class RequestExtractor {
-    private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
-        new ParameterizedTypeReference<Map<String, Object>>() {};
     private static final MediaType TEXT_ALL = MediaType.valueOf("text/*");
 
+    private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
 
     public Mono<RequestContext> extract(ServerRequest request) {
@@ -47,9 +48,23 @@ public class RequestExtractor {
             } else if (MULTIPART_FORM_DATA.includes(contentType)) {
                 return request.body(BodyExtractors.toMultipartData()).map(MultiValueMap::toSingleValueMap);
             } else if (APPLICATION_JSON.includes(contentType)) {
-                return request.bodyToMono(MAP_TYPE);
+                // Convert to String in order to receive non UTF-8 charset
+                return extractBodyAsString(request).map(string -> {
+                    try {
+                        return objectMapper.readValue(string, Map.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             } else if (APPLICATION_XML.includes(contentType)) {
-                return extractBodyAsXml(request);
+                // Convert to String in order to receive non UTF-8 charset
+                return extractBodyAsString(request).map(string -> {
+                    try {
+                        return xmlMapper.readValue(string, Map.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             } else if (TEXT_ALL.includes(contentType)) {
                 return extractBodyAsString(request);
             } else {
@@ -60,16 +75,6 @@ public class RequestExtractor {
 
     private Mono<String> extractBodyAsString(ServerRequest request) {
         return request.bodyToMono(String.class);
-    }
-
-    private Mono<Map> extractBodyAsXml(ServerRequest request) {
-        return extractBodyAsString(request).map(body -> {
-            try {
-                return xmlMapper.readValue(body, Map.class);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     private Mono<Void> extractBodyAsBytes(ServerRequest request) {
