@@ -10,6 +10,8 @@ import java.nio.charset.Charset
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ResponseBodySpec extends Specification {
+    static final SHIFT_JIS_CHARSET = Charset.forName('Shift_JIS')
+
     @Autowired WebTestClient client
 
     def 'Response body should be set regardless of accept'() {
@@ -38,8 +40,19 @@ class ResponseBodySpec extends Specification {
 
         then:
         response.expectStatus().isOk()
-        response.expectHeader().contentType(
-            new MediaType(MediaType.TEXT_PLAIN, Charset.forName('Shift_JIS')))
+        response.expectHeader().contentType(new MediaType(MediaType.TEXT_PLAIN, SHIFT_JIS_CHARSET))
         response.expectBody(String).isEqualTo(body)
+    }
+
+    def 'Response body should be given charset if it is application/json'() {
+        when:
+        def response = client.get()
+            .uri('/features/response-json-charset?charset=Shift_JIS')
+            .exchange() as WebTestClient.ResponseSpec
+
+        then:
+        response.expectStatus().isOk()
+        response.expectHeader().contentType(new MediaType(MediaType.APPLICATION_JSON, SHIFT_JIS_CHARSET))
+        response.expectBody(String).isEqualTo('[{"name":"あいうえお","id":1}]')
     }
 }

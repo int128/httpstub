@@ -2,10 +2,6 @@ package org.hidetake.stubyaml.model.execution;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
 
 import java.io.File;
 import java.util.List;
@@ -15,13 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static org.hidetake.stubyaml.util.MapUtils.mapValue;
 import static org.springframework.util.ObjectUtils.nullSafeToString;
 
-public interface CompiledResponseBody {
-    BodyInserter<?, ? super ServerHttpResponse> render(ResponseContext responseContext);
+public interface CompiledResponseBody<T> {
+    T evaluate(ResponseContext responseContext);
 
     class NullBody implements CompiledResponseBody {
         @Override
-        public BodyInserter<?, ? super ServerHttpResponse> render(ResponseContext responseContext) {
-            return BodyInserters.empty();
+        public Object evaluate(ResponseContext responseContext) {
+            return null;
         }
     }
 
@@ -30,8 +26,8 @@ public interface CompiledResponseBody {
         private final Object body;
 
         @Override
-        public BodyInserter<?, ? super ServerHttpResponse> render(ResponseContext responseContext) {
-            return BodyInserters.fromObject(evaluate(body, responseContext));
+        public Object evaluate(ResponseContext responseContext) {
+            return evaluate(body, responseContext);
         }
 
         private static Object evaluate(Object body, ResponseContext responseContext) {
@@ -54,16 +50,16 @@ public interface CompiledResponseBody {
     }
 
     @RequiredArgsConstructor
-    class FileBody implements CompiledResponseBody {
+    class FileBody implements CompiledResponseBody<File> {
         private final CompiledExpression filenameExpression;
         private final File baseDirectory;
 
         @Override
-        public BodyInserter<?, ? super ServerHttpResponse> render(ResponseContext responseContext) {
+        public File evaluate(ResponseContext responseContext) {
             val filename = nullSafeToString(filenameExpression.evaluate(responseContext));
             val file = new File(baseDirectory, filename);
             if (file.exists()) {
-                return BodyInserters.fromResource(new FileSystemResource(file));
+                return file;
             } else {
                 throw new IllegalStateException("No such file: " + file.getAbsolutePath());
             }

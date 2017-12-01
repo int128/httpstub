@@ -14,6 +14,8 @@ import java.nio.charset.Charset
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RequestBodySpec extends Specification {
+    static final SHIFT_JIS_CHARSET = Charset.forName('Shift_JIS')
+
     @Autowired WebTestClient client
 
     def 'Request body should be a Map if it is multipart/form-data'() {
@@ -70,12 +72,12 @@ class RequestBodySpec extends Specification {
 
     def 'Request body should be a Map if it is application/json and charset is not UTF-8'() {
         given:
-        def requestBody = '''{"name":"あいうえお"}'''.getBytes('Shift_JIS')
+        def requestBody = '{"name":"あいうえお"}'.getBytes(SHIFT_JIS_CHARSET)
 
         when:
         def response = client.post()
             .uri('/features/request-body-type')
-            .contentType(new MediaType(MediaType.APPLICATION_JSON, Charset.forName('Shift_JIS')))
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, SHIFT_JIS_CHARSET))
             .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
             .exchange()
 
@@ -107,12 +109,12 @@ class RequestBodySpec extends Specification {
 
     def 'Request body should be a Map if it is application/xml and charset is not UTF-8'() {
         given:
-        def requestBody = '''<name>あいうえお</name>'''.getBytes('Shift_JIS')
+        def requestBody = '<name>あいうえお</name>'.getBytes(SHIFT_JIS_CHARSET)
 
         when:
         def response = client.post()
             .uri('/features/request-body-type')
-            .contentType(new MediaType(MediaType.APPLICATION_XML, Charset.forName('Shift_JIS')))
+            .contentType(new MediaType(MediaType.APPLICATION_XML, SHIFT_JIS_CHARSET))
             .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
             .exchange()
 
