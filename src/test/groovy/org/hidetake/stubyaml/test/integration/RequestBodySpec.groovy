@@ -7,7 +7,10 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
+import reactor.core.publisher.Mono
 import spock.lang.Specification
+
+import java.nio.charset.Charset
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RequestBodySpec extends Specification {
@@ -65,6 +68,23 @@ class RequestBodySpec extends Specification {
         response.expectBody(String).isEqualTo('Map')
     }
 
+    def 'Request body should be a Map if it is application/json and charset is not UTF-8'() {
+        given:
+        def requestBody = '''{"name":"あいうえお"}'''.getBytes('Shift_JIS')
+
+        when:
+        def response = client.post()
+            .uri('/features/request-body-type')
+            .contentType(new MediaType(MediaType.APPLICATION_JSON, Charset.forName('Shift_JIS')))
+            .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
+            .exchange()
+
+        then:
+        response.expectStatus().isOk()
+        response.expectHeader().contentType(MediaType.TEXT_PLAIN)
+        response.expectBody(String).isEqualTo('Map')
+    }
+
     def 'Request body should be a Map if it is application/xml'() {
         given:
         def requestBody = '''\
@@ -77,6 +97,23 @@ class RequestBodySpec extends Specification {
             .uri('/features/request-body-type')
             .contentType(MediaType.APPLICATION_XML)
             .body(BodyInserters.fromObject(requestBody))
+            .exchange()
+
+        then:
+        response.expectStatus().isOk()
+        response.expectHeader().contentType(MediaType.TEXT_PLAIN)
+        response.expectBody(String).isEqualTo('Map')
+    }
+
+    def 'Request body should be a Map if it is application/xml and charset is not UTF-8'() {
+        given:
+        def requestBody = '''<name>あいうえお</name>'''.getBytes('Shift_JIS')
+
+        when:
+        def response = client.post()
+            .uri('/features/request-body-type')
+            .contentType(new MediaType(MediaType.APPLICATION_XML, Charset.forName('Shift_JIS')))
+            .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
             .exchange()
 
         then:
