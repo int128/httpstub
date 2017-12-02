@@ -21,6 +21,7 @@ import static org.springframework.http.MediaType.*;
 public class RequestExtractor {
     private static final MediaType TEXT_ALL = MediaType.valueOf("text/*");
 
+    private final RequestResponseLogger requestResponseLogger;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
 
@@ -44,33 +45,45 @@ public class RequestExtractor {
     private Mono<?> extractBody(ServerRequest request) {
         return request.headers().contentType().map(contentType -> {
             if (APPLICATION_FORM_URLENCODED.includes(contentType)) {
-                return request.body(BodyExtractors.toFormData()).map(MultiValueMap::toSingleValueMap);
+                return request.body(BodyExtractors.toFormData())
+                    .doOnSuccess(map -> requestResponseLogger.logRequest(request, map))
+                    .map(MultiValueMap::toSingleValueMap);
             } else if (MULTIPART_FORM_DATA.includes(contentType)) {
-                return request.body(BodyExtractors.toMultipartData()).map(MultiValueMap::toSingleValueMap);
+                return request.body(BodyExtractors.toMultipartData())
+                    .doOnSuccess(map -> requestResponseLogger.logRequest(request, map))
+                    .map(MultiValueMap::toSingleValueMap);
             } else if (APPLICATION_JSON.includes(contentType)) {
                 // Convert to String in order to receive non UTF-8 charset
-                return extractBodyAsString(request).map(string -> {
-                    try {
-                        return objectMapper.readValue(string, Map.class);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                return extractBodyAsString(request)
+                    .doOnSuccess(string -> requestResponseLogger.logRequest(request, string))
+                    .map(string -> {
+                        try {
+                            return objectMapper.readValue(string, Map.class);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
             } else if (APPLICATION_XML.includes(contentType)) {
                 // Convert to String in order to receive non UTF-8 charset
-                return extractBodyAsString(request).map(string -> {
-                    try {
-                        return xmlMapper.readValue(string, Map.class);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                return extractBodyAsString(request)
+                    .doOnSuccess(string -> requestResponseLogger.logRequest(request, string))
+                    .map(string -> {
+                        try {
+                            return xmlMapper.readValue(string, Map.class);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
             } else if (TEXT_ALL.includes(contentType)) {
-                return extractBodyAsString(request);
+                return extractBodyAsString(request)
+                    .doOnSuccess(string -> requestResponseLogger.logRequest(request, string));
             } else {
-                return extractBodyAsBytes(request);
+                return extractBodyAsBytes(request)
+                    .doOnSuccess(x -> requestResponseLogger.logRequest(request, "[body]"));
             }
-        }).orElseGet(() -> extractBodyAsBytes(request));
+        }).orElseGet(() ->
+            extractBodyAsBytes(request)
+                .doOnSuccess(x -> requestResponseLogger.logRequest(request, (String) null)));
     }
 
     private Mono<String> extractBodyAsString(ServerRequest request) {

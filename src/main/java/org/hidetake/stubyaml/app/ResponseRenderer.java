@@ -10,9 +10,8 @@ import org.hidetake.stubyaml.model.execution.ResponseContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -26,41 +25,50 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 @RequiredArgsConstructor
 @Component
 public class ResponseRenderer {
+    private final RequestResponseLogger requestResponseLogger;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
 
-    public Mono<ServerResponse> render(CompiledResponse response, RequestContext requestContext) {
+    public Mono<ServerResponse> render(CompiledResponse compiledResponse, RequestContext requestContext) {
         val responseContext = ResponseContext.builder()
             .requestContext(requestContext)
-            .resolvedTable(response.getTables().resolve(requestContext))
+            .resolvedTable(compiledResponse.getTables().resolve(requestContext))
             .build();
-
-        val headers = new HttpHeaders();
-        headers.setAll(response.evaluateHeaders(responseContext));
-
-        return ServerResponse
-            .status(response.getHttpStatus())
-            .headers(httpHeaders -> httpHeaders.putAll(headers))
-            .body(renderBody(response.getBody().evaluate(responseContext), headers))
-            .delayElement(response.getDelay());
+        return renderInternal(compiledResponse, responseContext)
+            .delayElement(compiledResponse.getDelay());
     }
 
-    private BodyInserter<?,? super ServerHttpResponse> renderBody(Object body, HttpHeaders headers) {
-        if (body == null) {
-            return BodyInserters.empty();
-        } else if (body instanceof String) {
-            return BodyInserters.fromObject(body);
-        } else if (body instanceof File) {
-            return BodyInserters.fromResource(new FileSystemResource((File) body));
+    private Mono<ServerResponse> renderInternal(CompiledResponse compiledResponse, ResponseContext responseContext) {
+        val headers = new HttpHeaders();
+        headers.setAll(compiledResponse.evaluateHeaders(responseContext));
+
+        val responseBuilder = ServerResponse
+            .status(compiledResponse.getHttpStatus())
+            .headers(httpHeaders -> httpHeaders.putAll(headers));
+
+        val evaluatedBody = compiledResponse.getBody().evaluate(responseContext);
+        if (evaluatedBody == null) {
+            return responseBuilder.build()
+                .doOnSuccess(response -> requestResponseLogger.logResponse(response, null));
+        } else if (evaluatedBody instanceof File) {
+            val resource = new FileSystemResource((File) evaluatedBody);
+            return responseBuilder
+                .body(BodyInserters.fromResource(resource))
+                .doOnSuccess(response -> requestResponseLogger.logResponse(response, resource.toString()));
         } else {
-            val contentType = headers.getContentType();
-            val serialized = serialize(body, contentType);
-            return BodyInserters.fromObject(serialized);
+            val serializedBody = serialize(evaluatedBody, headers.getContentType());
+            return responseBuilder
+                .syncBody(serializedBody)
+                .doOnSuccess(response -> requestResponseLogger.logResponse(response, serializedBody));
         }
     }
 
-    private String serialize(Object body, MediaType contentType) {
-        if (APPLICATION_JSON.includes(contentType)) {
+    private String serialize(@Nullable Object body, @Nullable MediaType contentType) {
+        if (body == null) {
+            return null;
+        } else if (body instanceof String) {
+            return (String) body;
+        } else if (APPLICATION_JSON.includes(contentType)) {
             // Convert to String in order to send non UTF-8 charset
             try {
                 return objectMapper.writeValueAsString(body);

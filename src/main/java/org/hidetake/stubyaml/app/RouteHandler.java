@@ -17,7 +17,6 @@ public class RouteHandler {
 
     private final RequestExtractor requestExtractor;
     private final ResponseRenderer responseRenderer;
-    private final RequestResponseLogger requestResponseLogger;
 
     public Mono<ServerResponse> handle(CompiledRoute route, ServerRequest request) {
         return requestExtractor
