@@ -39,11 +39,11 @@ public class RouteCompiler {
                 switch (route.getType()) {
                     case YAML:
                         return Optional.of(CompiledRoute.builder()
-                            .requestPredicate(requestPredicate(route))
+                            .requestPredicate(requestPredicate(routeSource, route))
                             .rules(compileYaml(routeSource))
                             .build());
-
                     default:
+                        log.warn("Ignored unknown file {}", routeSource);
                         return Optional.empty();
                 }
             });
@@ -56,7 +56,7 @@ public class RouteCompiler {
     }
 
     private List<Rule> parseYaml(RouteSource routeSource) {
-        try (val yamlStream = new FileInputStream(routeSource.getYamlFile())) {
+        try (val yamlStream = new FileInputStream(routeSource.getFile())) {
             val rules = yamlParser.loadAs(yamlStream, Rule[].class);
             if (rules == null) {
                 log.warn("No rules found in YAML file {}", routeSource);
@@ -65,20 +65,18 @@ public class RouteCompiler {
                 return asList(rules);
             }
         } catch (IOException e) {
-            log.warn("Ignored YAML file {}", routeSource, e);
-            return emptyList();
+            throw new RuntimeException(e);
         } catch (YAMLException e) {
-            log.error("Ignored invalid YAML file {}\n{}", routeSource, e.toString());
-            return emptyList();
+            throw new IllegalRouteException(routeSource, e);
         }
     }
 
-    private static RequestPredicate requestPredicate(Route route) {
+    private static RequestPredicate requestPredicate(RouteSource routeSource, Route route) {
+        val httpMethodName = route.getMethod().toUpperCase();
         try {
-            val httpMethod = HttpMethod.valueOf(route.getMethod().toUpperCase());
-            return method(httpMethod).and(path(route.getRequestPath()));
+            return method(HttpMethod.valueOf(httpMethodName)).and(path(route.getRequestPath()));
         } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Ignored invalid HTTP method: " + route);
+            throw new IllegalRouteException(routeSource, "Ignored invalid HTTP method: " + httpMethodName);
         }
     }
 }

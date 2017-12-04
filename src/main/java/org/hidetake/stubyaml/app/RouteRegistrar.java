@@ -42,24 +42,7 @@ public class RouteRegistrar {
                 baseDirectory.getAbsolutePath()));
         }
         try {
-            List<Exception> exceptions = new ArrayList<>();
-            List<RouterFunction<ServerResponse>> functions =
-                scan(baseDirectory).flatMap(routeSource -> {
-                    try {
-                        return routeCompiler.compile(routeSource, baseDirectory)
-                            .map(compiledRoute -> Stream.of(
-                                RouterFunctions.route(
-                                    compiledRoute.getRequestPredicate(),
-                                    request -> routeHandler.handle(compiledRoute, request))))
-                            .orElse(Stream.empty());
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                        return Stream.empty();
-                    }
-                }).collect(toList());
-
-            RouterFunction<ServerResponse> index = indexResponse(functions, exceptions);
-            return functions.stream().reduce(index, RouterFunction::and);
+            return stubResponse(baseDirectory);
         } catch (IOException e) {
             return errorResponse(String.format("Error while scanning directory: %s\n%s",
                 baseDirectory.getAbsoluteFile(),
@@ -67,19 +50,35 @@ public class RouteRegistrar {
         }
     }
 
-    private Stream<RouteSource> scan(File baseDirectory) throws IOException {
+    private RouterFunction<ServerResponse> stubResponse(File baseDirectory) throws IOException {
         log.info("Scanning files in {}", baseDirectory.getAbsolutePath());
-        val basePath = baseDirectory.toPath();
-        return Files.walk(basePath)
+        val exceptions = new ArrayList<Exception>();
+        val functions = Files.walk(baseDirectory.toPath())
             .filter(path -> path.toFile().isFile())
-            .map(path -> new RouteSource(path.toFile()));
+            .map(path -> new RouteSource(path.toFile()))
+            .flatMap(routeSource -> {
+                try {
+                    return routeCompiler.compile(routeSource, baseDirectory)
+                        .map(compiledRoute -> Stream.of(
+                            RouterFunctions.route(
+                                compiledRoute.getRequestPredicate(),
+                                request -> routeHandler.handle(compiledRoute, request))))
+                        .orElse(Stream.empty());
+                } catch (Exception e) {
+                    exceptions.add(e);
+                    return Stream.empty();
+                }
+            }).collect(toList());
+        return functions.stream().reduce(indexResponse(functions, exceptions), RouterFunction::and);
     }
 
     private static RouterFunction<ServerResponse> indexResponse(List<RouterFunction<ServerResponse>> functions, List<Exception> exceptions) {
         // TODO: Thymeleaf
         val status = String.format(
-            "## ERRORS\n%s\n\n## ROUTES\n%s",
-            String.join("\n", exceptions.stream().map(Throwable::toString).collect(toList())),
+            "## %d ERROR(S)\n\n%s\n\n## %d ROUTE(S)\n\n%s",
+            exceptions.size(),
+            String.join("\n----\n", exceptions.stream().map(Throwable::toString).collect(toList())),
+            functions.size(),
             String.join("\n", functions.stream().map(RouterFunction::toString).collect(toList())));
         return RouterFunctions.route(GET("/"), request -> ok().syncBody(status));
     }

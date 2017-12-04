@@ -3,13 +3,12 @@ package org.hidetake.stubyaml.model;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyRuntimeException;
 import groovy.lang.Script;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledExpression;
+import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@Slf4j
 @Component
 public class ExpressionCompiler {
     /**
@@ -19,16 +18,15 @@ public class ExpressionCompiler {
      * @return compiled
      */
     @SuppressWarnings("unchecked")
-    public CompiledExpression compileExpression(String expression) {
+    public CompiledExpression compileExpression(String expression, RouteSource source) {
         if (expression == null) {
             return null;
         }
         try {
-            val clazz = new GroovyClassLoader().parseClass(expression);
+            val clazz = new GroovyClassLoader().parseClass(expression, source.getName());
             return new CompiledExpression((Class<Script>) clazz);
         } catch (GroovyRuntimeException e) {
-            log.warn("Ignored invalid expression {}\n{}", expression, e.toString());
-            return null;
+            throw new IllegalRuleException("Invalid expression: " + expression, source, e);
         }
     }
 
@@ -39,15 +37,15 @@ public class ExpressionCompiler {
      * @param template Groovy template
      * @return compiled
      */
-    public CompiledExpression compileTemplate(String template) {
+    public CompiledExpression compileTemplate(String template, RouteSource source) {
         if (template == null) {
             return null;
         }
         if (template.startsWith("${") && template.endsWith("}")) {
-            return compileExpression(template.substring(2, template.length() - 1));
+            return compileExpression(template.substring(2, template.length() - 1), source);
         }
         return compileExpression("\"\"\"" +
             StringUtils.replace(template, "\"\"\"", "\\\"\\\"\\\"") +
-            "\"\"\"");
+            "\"\"\"", source);
     }
 }

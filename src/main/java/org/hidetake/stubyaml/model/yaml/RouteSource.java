@@ -16,7 +16,11 @@ import java.util.stream.StreamSupport;
 public class RouteSource {
     private static final Pattern PATH_PATTERN = Pattern.compile("(.+)\\.(.+?)\\.(.+?)$");
 
-    private final File yamlFile;
+    private final File file;
+
+    public String getName() {
+        return file.getPath();
+    }
 
     public Optional<Route> parseName(Path basePath) {
         val relativePath = computeRelativePath(basePath);
@@ -35,7 +39,7 @@ public class RouteSource {
     }
 
     public String computeRelativePath(Path basePath) {
-        val relativePath = basePath.relativize(yamlFile.toPath());
+        val relativePath = basePath.relativize(file.toPath());
         return "/" + StreamSupport.stream(relativePath.spliterator(), false)
             .map(Path::toString)
             .collect(Collectors.joining("/"));
