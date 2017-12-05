@@ -1,26 +1,30 @@
-# stubyaml [![CircleCI](https://circleci.com/gh/int128/stubyaml.svg?style=shield)](https://circleci.com/gh/int128/stubyaml) [![Gradle Status](https://gradleupdate.appspot.com/int128/stubyaml/status.svg)](https://gradleupdate.appspot.com/int128/stubyaml/status)
+# apistub [![CircleCI](https://circleci.com/gh/int128/stubyaml.svg?style=shield)](https://circleci.com/gh/int128/stubyaml) [![Gradle Status](https://gradleupdate.appspot.com/int128/stubyaml/status.svg)](https://gradleupdate.appspot.com/int128/stubyaml/status)
 
-A YAML based HTTP stub server for API testing.
+A HTTP stub server for API testing.
 
-It has following key features:
+Key features:
 
-- Easy to run and deploy
-- Declarative API definition with YAML
-- Flexible template and pattern matching with Groovy
+- Easy to run
+- Declarative API definition by YAML
+- Template and pattern matching with Groovy
 - Continuous reload on file change
+
+Architecture:
+
+- Spring Boot 2
+- WebFlux
 
 
 ## Getting Started
 
-Java 8 is required.
-Download the latest JAR from [here](https://github.com/int128/stubyaml/releases).
+Download [the latest release](https://github.com/int128/stubyaml/releases).
 
-```
+Create stub definition as a YAML file `data/users.get.yaml`.
+
+```sh
 mkdir -p data
 vim data/users.get.yaml
 ```
-
-Create YAML file `data/users.get.yaml` as following:
 
 ```yaml
 - response:
@@ -56,7 +60,7 @@ curl -v http://localhost:8080/users
 [{"name":"Foo","id":1},{"name":"Bar","id":2}]
 ```
 
-The stub will reload YAML files if anyone has been changed or new one has been created.
+The stub will reload YAML files if they have been changed or new one has been created.
 
 
 ## Options
@@ -79,31 +83,19 @@ java -jar stubyaml.jar
 
 ### Request and response logging
 
-You can turn on request and response log as follows:
+The stub shows following log for each request.
 
 ```
-# Command line option
-java -jar stubyaml.jar --request-response-log
-
-# Environment variable
-export REQUEST_RESPONSE_LOG=1
-java -jar stubyaml.jar
-```
-
-The stub will write request and response log as follows:
-
-```
-2017-11-16 06:52:36.289  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> GET /users
-2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> User-Agent: curl/7.47.0
-2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Accept: */*
-2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|> Host: localhost:8080
-2017-11-16 06:52:36.291  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|>
-2017-11-16 06:52:36.414  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< 200 OK
-2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Date: Thu, 16 Nov 2017 06:52:36 GMT
-2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< x-uuid: 1f7d7e56-f669-474c-83ca-7003352b67f6
-2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< Content-Type: application/json
-2017-11-16 06:52:36.415  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|<
-2017-11-16 06:52:36.419  INFO 19613 --- [qtp766696861-16] o.h.s.RequestAndResponseLoggingFilter    : 127.0.0.1|< [{"name":"Foo","id":1},{"name":"Bar","id":2}]
+2017-12-05 10:44:20.042  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : > GET /users
+2017-12-05 10:44:20.043  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : > Host: localhost:8080
+2017-12-05 10:44:20.044  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : > User-Agent: curl/7.54.0
+2017-12-05 10:44:20.044  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : > Accept: */*
+2017-12-05 10:44:20.044  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : >
+2017-12-05 10:44:20.047  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < 200 OK
+2017-12-05 10:44:20.048  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < content-type: application/json
+2017-12-05 10:44:20.049  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < x-uuid: 1992cb3d-7bbf-4c2e-aa65-a19fa656f77e
+2017-12-05 10:44:20.050  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : <
+2017-12-05 10:44:20.050  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < [{"name":"Foo","id":1},{"name":"Bar","id":2}]
 ```
 
 
@@ -170,7 +162,7 @@ For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/
 
 ### Using template
 
-Response header value and body are parsed as a Groovy template.
+Response header value and response body are parsed as a Groovy template.
 Following variables are available in a script block `${}`.
 
 Variable    | Object
