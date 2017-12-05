@@ -6,8 +6,6 @@ import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.util.Assert.notNull;
-
 @RequiredArgsConstructor
 @Component
 public class RuleCompiler {
@@ -15,10 +13,9 @@ public class RuleCompiler {
     private final ResponseCompiler responseCompiler;
 
     public CompiledRule compile(RouteSource source, Rule rule) {
-        notNull(rule, "rule should not be null");
         return CompiledRule.builder()
-            .when(expressionCompiler.compileExpression(rule.getWhen()))
-            .response(responseCompiler.compile(source, rule.getResponse()))
+            .when(expressionCompiler.compileExpression(rule.getWhen(), source))
+            .response(responseCompiler.compile(rule.getResponse(), source))
             .build();
     }
 }

@@ -1,12 +1,12 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.hidetake.stubyaml.model.execution.CompiledTable;
 import org.hidetake.stubyaml.model.execution.CompiledTables;
+import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.hidetake.stubyaml.model.yaml.Table;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -14,36 +14,32 @@ import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TableCompiler {
     private final ExpressionCompiler expressionCompiler;
 
-    public CompiledTables compile(List<Table> tables) {
+    public CompiledTables compile(List<Table> tables, RouteSource source) {
         return new CompiledTables(tables
             .stream()
-            .map(this::compile)
+            .map(table -> compile(table, source))
             .filter(Objects::nonNull)
             .collect(toList()));
     }
 
-    public CompiledTable compile(Table table) {
+    public CompiledTable compile(Table table, RouteSource source) {
         if (!StringUtils.hasText(table.getName())) {
-            log.error("Table name is null, ignored {}", table);
-            return null;
+            throw new IllegalRuleException("Table name must not be empty: " + table, source);
         }
         if (!StringUtils.hasText(table.getKey())) {
-            log.error("Table key is null, ignored {}", table);
-            return null;
+            throw new IllegalRuleException("Table key must not be empty: " + table, source);
         }
-        if (ObjectUtils.isEmpty(table.getValues())) {
-            log.error("Table values are empty, ignored {}", table);
-            return null;
+        if (CollectionUtils.isEmpty(table.getValues())) {
+            throw new IllegalRuleException("Table values must not be empty: " + table, source);
         }
         return CompiledTable.builder()
             .name(table.getName())
-            .keyExpression(expressionCompiler.compileExpression(table.getKey()))
+            .keyExpression(expressionCompiler.compileExpression(table.getKey(), source))
             .values(table.getValues())
             .build();
     }
