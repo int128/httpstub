@@ -59,10 +59,9 @@ public class RouteRegistrar {
             .flatMap(routeSource -> {
                 try {
                     return routeCompiler.compile(routeSource, baseDirectory)
-                        .map(compiledRoute -> Stream.of(
-                            RouterFunctions.route(
-                                compiledRoute.getRequestPredicate(),
-                                request -> routeHandler.handle(compiledRoute, request))))
+                        .map(compiledRoute -> Stream.of(RouterFunctions.route(
+                            compiledRoute.getRequestPredicate(),
+                            routeHandler.proxy(compiledRoute))))
                         .orElse(Stream.empty());
                 } catch (Exception e) {
                     exceptions.add(e);
