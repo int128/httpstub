@@ -1,5 +1,6 @@
 package org.hidetake.stubyaml.app;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.codec.multipart.Part;
@@ -12,29 +13,40 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import java.util.Arrays;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class RequestResponseLogger {
     private static final String RECEIVED = ">";
     private static final String SENT = "<";
 
+    private final ConfigHolder configHolder;
+
     public void logRequest(ServerRequest request, MultiValueMap<String, ?> map) {
-        logRequestHeaders(request);
-        map.forEach((key, values) -> values.forEach(value -> {
-            if (value instanceof Part) {
-                val part = (Part) value;
-                part.headers().forEach((headerKey, headerValues) -> headerValues.forEach(headerValue ->
-                    log.info("{} [{}] {}: {}", RECEIVED, key, headerKey, headerValue)));
-            } else {
-                log.info("{} {}={}", RECEIVED, key, value);
-            }
-        }));
+        if (configHolder.getConfig().getLogging().isHeaders()) {
+            logRequestHeaders(request);
+        }
+        if (configHolder.getConfig().getLogging().isBody()) {
+            map.forEach((key, values) -> values.forEach(value -> {
+                if (value instanceof Part) {
+                    val part = (Part) value;
+                    part.headers().forEach((headerKey, headerValues) -> headerValues.forEach(headerValue ->
+                        log.info("{} [{}] {}: {}", RECEIVED, key, headerKey, headerValue)));
+                } else {
+                    log.info("{} {}={}", RECEIVED, key, value);
+                }
+            }));
+        }
     }
 
     public void logRequest(ServerRequest request, @Nullable String body) {
-        logRequestHeaders(request);
-        if (body != null) {
-            Arrays.stream(body.split("\r\n|\r|\n")).forEach(line ->
-                log.info("{} {}", RECEIVED, line));
+        if (configHolder.getConfig().getLogging().isHeaders()) {
+            logRequestHeaders(request);
+        }
+        if (configHolder.getConfig().getLogging().isBody()) {
+            if (body != null) {
+                Arrays.stream(body.split("\r\n|\r|\n")).forEach(line ->
+                    log.info("{} {}", RECEIVED, line));
+            }
         }
     }
 
@@ -46,14 +58,18 @@ public class RequestResponseLogger {
     }
 
     public void logResponse(ServerResponse response, @Nullable String body) {
-        val status = response.statusCode();
-        log.info("{} {} {}", SENT, status.value(), status.getReasonPhrase());
-        response.headers().forEach((key, values) ->
-            values.forEach(value -> log.info("{} {}: {}", SENT, key, value)));
-        log.info(SENT);
-        if (body != null) {
-            Arrays.stream(body.split("\r\n|\r|\n")).forEach(line ->
-                log.info("{} {}", SENT, line));
+        if (configHolder.getConfig().getLogging().isHeaders()) {
+            val status = response.statusCode();
+            log.info("{} {} {}", SENT, status.value(), status.getReasonPhrase());
+            response.headers().forEach((key, values) ->
+                values.forEach(value -> log.info("{} {}: {}", SENT, key, value)));
+            log.info(SENT);
+        }
+        if (configHolder.getConfig().getLogging().isBody()) {
+            if (body != null) {
+                Arrays.stream(body.split("\r\n|\r|\n")).forEach(line ->
+                    log.info("{} {}", SENT, line));
+            }
         }
     }
 }
