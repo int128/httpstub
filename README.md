@@ -108,9 +108,9 @@ logging:
 ```
 
 
-## Examples
+## Recipes
 
-### Handling various HTTP methods
+### HTTP methods
 
 Specify HTTP method in the extension part of filename.
 For example, create `data/users.post.yaml` for handling POST method.
@@ -126,7 +126,7 @@ Following methods are supported.
 - TRACE
 
 
-### Serving various contents
+### Content type
 
 Set the content type header as follows:
 
@@ -153,6 +153,9 @@ Set the character set for response body if needed:
     body: Example
 ```
 
+
+### Response file
+
 You can specify a `file` instead of `body` as follows:
 
 ```yaml
@@ -169,9 +172,15 @@ A braced string in the file path is treated as a path variable.
 For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
 
 
-### Using template
+### Template
 
-Response header value and response body are parsed as a Groovy template.
+Following values are parsed as a Groovy template:
+
+- Response header value
+- Response body (`body`)
+- Response filename (`file`)
+- Table key (`key` of `tables`)
+
 Following variables are available in a script block `${}`.
 
 Variable    | Object
@@ -216,7 +225,7 @@ The stub will return the following response on the request `GET /users/100`:
 ### Pattern matching
 
 A YAML file has one or more rules.
-The stub evaluates all rules and returns the first matched `response`.
+The stub evaluates each `when` of all rules and returns the first matched `response`.
 
 Here is the example of `/numbers.get.yaml` as follows:
 
@@ -249,7 +258,9 @@ And on the request `GET /numbers?order=desc`:
 If the last resort is not defined, the stub will return 404.
 
 
-### Data driven testing
+### Tables
+
+Tables are usuful for data variation testing.
 
 Let's see the example.
 
@@ -305,7 +316,7 @@ And on the request `GET /users/2`:
 ```
 
 
-## Delayed response
+## Delay
 
 Use `delay` attribute in milliseconds to simulate network latency.
 
