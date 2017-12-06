@@ -17,6 +17,7 @@ import java.time.Duration;
 @Configuration
 public class StubInitializer implements InitializingBean {
     private final DirectoryWatcher directoryWatcher;
+    private final ConfigRegistrar configRegistrar;
     private final RouteRegistrar routeRegistrar;
 
     @Getter @Setter
@@ -34,6 +35,9 @@ public class StubInitializer implements InitializingBean {
         directoryWatcher.startThread(
             baseDirectory,
             Duration.ofSeconds(intervalSec),
-            () -> routeRegistrar.register(baseDirectory));
+            () -> {
+                configRegistrar.register(baseDirectory);
+                routeRegistrar.register(baseDirectory);
+            });
     }
 }

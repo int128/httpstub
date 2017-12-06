@@ -81,6 +81,7 @@ export LOGGING_PATH=logs
 java -jar stubyaml.jar
 ```
 
+
 ### Request and response logging
 
 The stub shows following log for each request.
@@ -96,6 +97,14 @@ The stub shows following log for each request.
 2017-12-05 10:44:20.049  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < x-uuid: 1992cb3d-7bbf-4c2e-aa65-a19fa656f77e
 2017-12-05 10:44:20.050  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : <
 2017-12-05 10:44:20.050  INFO 19694 --- [ctor-http-nio-2] o.h.stubyaml.app.RequestResponseLogger   : < [{"name":"Foo","id":1},{"name":"Bar","id":2}]
+```
+
+You can turn off logging by creating `data/config.yaml`:
+
+```yaml
+logging:
+  headers: false
+  body: false
 ```
 
 
