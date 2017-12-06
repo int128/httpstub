@@ -15,6 +15,7 @@ public class RequestContext implements Bindable {
     private final Map<String, String> pathVariables;
     private final Map<String, String> requestParams;
     private final Object requestBody;
+    private final Map<String, Object> constants;
 
     @Getter(lazy = true)
     private final Binding binding = createBinding();
@@ -25,6 +26,7 @@ public class RequestContext implements Bindable {
         binding.setVariable("path", pathVariables);
         binding.setVariable("params", requestParams);
         binding.setVariable("body", requestBody);
+        binding.setVariable("constants", constants);
         return binding;
     };
 }

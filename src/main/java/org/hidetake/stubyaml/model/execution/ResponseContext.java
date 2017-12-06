@@ -15,7 +15,7 @@ public class ResponseContext implements Bindable {
     @Getter(lazy = true)
     private final Binding binding = createBinding();
 
-    Binding createBinding() {
+    private Binding createBinding() {
         val binding = requestContext.createBinding();
         binding.setVariable("table", resolvedTable.getMap());
         return binding;

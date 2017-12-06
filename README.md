@@ -19,7 +19,7 @@ Architecture:
 
 Download [the latest release](https://github.com/int128/stubyaml/releases).
 
-Create stub definition as a YAML file `data/users.get.yaml`.
+Define a route as follows:
 
 ```sh
 mkdir -p data
@@ -27,6 +27,7 @@ vim data/users.get.yaml
 ```
 
 ```yaml
+# data/users.get.yaml
 - response:
     headers:
       content-type: application/json
@@ -113,7 +114,7 @@ logging:
 ### HTTP methods
 
 Specify HTTP method in the extension part of filename.
-For example, create `data/users.post.yaml` for handling POST method.
+For example, create a route file `data/users.post.yaml` for handling POST method.
 Following methods are supported.
 
 - GET
@@ -170,6 +171,28 @@ You can specify a `file` instead of `body` as follows:
 
 A braced string in the file path is treated as a path variable.
 For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
+
+
+### Constants
+
+Define constants in `data/config.yaml`:
+
+```yaml
+constants:
+  today: "2017-12-01"
+```
+
+You can use constants in a route YAML:
+
+```yaml
+- response:
+    headers:
+      content-type: application/json
+    body:
+      - id: 1
+        name: Foo
+        registeredDate: ${constants.today}
+```
 
 
 ### Template

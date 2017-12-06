@@ -1,0 +1,6 @@
+logging:
+  headers: true
+  body: true
+
+constants:
+  today: "2017-12-01"

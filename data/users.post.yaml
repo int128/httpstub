@@ -7,3 +7,4 @@
       name: ${body.name}
       description: user#${body.id}
       active: ${body.active as boolean}
+      registeredDate: ${constants.today}

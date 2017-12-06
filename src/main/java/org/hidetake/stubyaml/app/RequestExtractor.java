@@ -3,6 +3,7 @@ package org.hidetake.stubyaml.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.hidetake.stubyaml.model.execution.RequestContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -21,25 +22,20 @@ import static org.springframework.http.MediaType.*;
 public class RequestExtractor {
     private static final MediaType TEXT_ALL = MediaType.valueOf("text/*");
 
+    private final ConfigHolder configHolder;
     private final RequestResponseLogger requestResponseLogger;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
 
     public Mono<RequestContext> extract(ServerRequest request) {
+        val builder = RequestContext.builder()
+            .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())
+            .pathVariables(request.pathVariables())
+            .requestParams(request.queryParams().toSingleValueMap())
+            .constants(configHolder.getConfig().getConstants());
         return extractBody(request)
-            .map(body ->
-                RequestContext.builder()
-                    .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())
-                    .pathVariables(request.pathVariables())
-                    .requestParams(request.queryParams().toSingleValueMap())
-                    .requestBody(body)
-                    .build())
-            .switchIfEmpty(Mono.fromSupplier(() ->
-                RequestContext.builder()
-                    .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())
-                    .pathVariables(request.pathVariables())
-                    .requestParams(request.queryParams().toSingleValueMap())
-                    .build()));
+            .map(body -> builder.requestBody(body).build())
+            .switchIfEmpty(Mono.fromSupplier(builder::build));
     }
 
     private Mono<?> extractBody(ServerRequest request) {
