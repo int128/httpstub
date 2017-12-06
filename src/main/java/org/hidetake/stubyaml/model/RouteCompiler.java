@@ -1,7 +1,6 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
@@ -26,7 +25,6 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.web.reactive.function.server.RequestPredicates.method;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RouteCompiler {
@@ -43,7 +41,6 @@ public class RouteCompiler {
                             .rules(compileYaml(routeSource))
                             .build());
                     default:
-                        log.warn("Ignored unknown file {}", routeSource);
                         return Optional.empty();
                 }
             });
@@ -59,7 +56,6 @@ public class RouteCompiler {
         try (val yamlStream = new FileInputStream(routeSource.getFile())) {
             val rules = yamlParser.loadAs(yamlStream, Rule[].class);
             if (rules == null) {
-                log.warn("No rules found in YAML file {}", routeSource);
                 return emptyList();
             } else {
                 return asList(rules);

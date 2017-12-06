@@ -22,6 +22,7 @@ public class ConfigRegistrar {
                 val config = configCompiler.compile(configFile);
                 configHolder.setConfig(config);
             } catch (Exception e) {
+                log.warn("Ignored invalid config: {}", e.toString());
                 configHolder.reset();
             }
         } else {

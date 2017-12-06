@@ -5,5 +5,7 @@
     body:
       - id: 1
         name: Foo
+        registeredDate: ${constants.today}
       - id: 2
         name: Bar
+        registeredDate: ${constants.today}
