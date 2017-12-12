@@ -1,4 +1,4 @@
-# apistub [![CircleCI](https://circleci.com/gh/int128/stubyaml.svg?style=shield)](https://circleci.com/gh/int128/stubyaml) [![Gradle Status](https://gradleupdate.appspot.com/int128/stubyaml/status.svg)](https://gradleupdate.appspot.com/int128/stubyaml/status)
+# httpstub [![CircleCI](https://circleci.com/gh/int128/httpstub.svg?style=shield)](https://circleci.com/gh/int128/httpstub) [![Gradle Status](https://gradleupdate.appspot.com/int128/httpstub/status.svg)](https://gradleupdate.appspot.com/int128/httpstub/status)
 
 A HTTP stub server for API testing.
 
@@ -17,7 +17,7 @@ Architecture:
 
 ## Getting Started
 
-Download [the latest release](https://github.com/int128/stubyaml/releases).
+Download [the latest release](https://github.com/int128/httpstub/releases).
 
 Define a route as follows:
 
@@ -41,7 +41,7 @@ vim data/users.get.yaml
 Run the application:
 
 ```
-java -jar stubyaml.jar
+java -jar httpstub.jar
 ```
 
 Call the API:
@@ -75,11 +75,11 @@ See [Spring Boot features: Logging](https://docs.spring.io/spring-boot/docs/curr
 
 ```
 # Command line option
-java -jar stubyaml.jar --logging.path=logs
+java -jar httpstub.jar --logging.path=logs
 
 # Environment variable
 export LOGGING_PATH=logs
-java -jar stubyaml.jar
+java -jar httpstub.jar
 ```
 
 

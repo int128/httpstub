@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8
-    working_directory: ~/stubyaml
+    working_directory: ~/httpstub
     steps:
       - checkout
 
@@ -36,17 +36,17 @@ jobs:
 
               github-release release \
                 --user int128 \
-                --repo stubyaml \
+                --repo httpstub \
                 --tag "$CIRCLE_TAG" \
                 --name "$CIRCLE_TAG" \
                 --description "Released on $(date +%Y-%m-%d)" || true
 
               github-release upload \
                 --user int128 \
-                --repo stubyaml \
+                --repo httpstub \
                 --tag "$CIRCLE_TAG" \
-                --name stubyaml.jar \
-                --file build/libs/stubyaml.jar
+                --name httpstub.jar \
+                --file build/libs/httpstub.jar
             fi
 
 deployment:
