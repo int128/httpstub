@@ -21,20 +21,22 @@ public class RequestResponseLogger {
 
     private final ConfigHolder configHolder;
 
-    public void logRequest(ServerRequest request, MultiValueMap<String, ?> map) {
+    public void logRequest(ServerRequest request, @Nullable MultiValueMap<String, ?> map) {
         if (configHolder.getConfig().getLogging().isHeaders()) {
             logRequestHeaders(request);
         }
         if (configHolder.getConfig().getLogging().isBody()) {
-            map.forEach((key, values) -> values.forEach(value -> {
-                if (value instanceof Part) {
-                    val part = (Part) value;
-                    part.headers().forEach((headerKey, headerValues) -> headerValues.forEach(headerValue ->
-                        log.info("{} [{}] {}: {}", RECEIVED, key, headerKey, headerValue)));
-                } else {
-                    log.info("{} {}={}", RECEIVED, key, value);
-                }
-            }));
+            if (map != null) {
+                map.forEach((key, values) -> values.forEach(value -> {
+                    if (value instanceof Part) {
+                        val part = (Part) value;
+                        part.headers().forEach((headerKey, headerValues) -> headerValues.forEach(headerValue ->
+                            log.info("{} [{}] {}: {}", RECEIVED, key, headerKey, headerValue)));
+                    } else {
+                        log.info("{} {}={}", RECEIVED, key, value);
+                    }
+                }));
+            }
         }
     }
 
