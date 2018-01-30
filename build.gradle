@@ -5,13 +5,12 @@ buildscript {
     maven { url 'https://repo.spring.io/libs-milestone' }
   }
   dependencies {
-    classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.M6'
+    classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.M7'
   }
 }
 
 plugins {
   id 'groovy'
-  id 'org.springframework.boot' version '1.5.8.RELEASE'
 }
 
 // TODO: remove when 2.0.0 is released
