@@ -1,10 +1,14 @@
-FROM openjdk:8-jdk-alpine
+# Build App
+FROM openjdk:8-jdk-alpine AS BUILD
 
-ADD . /app
+ADD . /work
+WORKDIR /work
+RUN ./gradlew build --build-file ./build.gradle
 
-RUN /app/gradlew build --build-file /app/build.gradle
+# Run App
+FROM openjdk:8-jre-alpine
 
+COPY --from=BUILD /work/build/libs/httpstub.jar /app/httpstub.jar
 EXPOSE 8080
-
 WORKDIR /app
-CMD ["/usr/bin/java", "-jar", "./build/libs/httpstub.jar"]
+ENTRYPOINT /usr/bin/java -jar httpstub.jar
