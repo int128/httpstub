@@ -1,42 +1,27 @@
-buildscript {
-  repositories {
-    jcenter()
-    // TODO: remove when 2.0.0 is released
-    maven { url 'https://repo.spring.io/libs-milestone' }
-  }
-  dependencies {
-    classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.M7'
-  }
-}
-
 plugins {
   id 'groovy'
+  id 'org.springframework.boot' version '2.0.3.RELEASE'
+  id 'io.spring.dependency-management' version '1.0.6.RELEASE'
 }
-
-// TODO: remove when 2.0.0 is released
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
   jcenter()
-  // TODO: remove when 2.0.0 is released
-  maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
 dependencies {
-  compile 'org.yaml:snakeyaml:1.19'
+  compile 'org.yaml:snakeyaml'
   compile 'org.springframework.boot:spring-boot-starter-webflux'
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  compile 'org.codehaus.groovy:groovy-all:2.4.12'
-  compileOnly 'org.projectlombok:lombok:1.16.18'
+  compile 'org.codehaus.groovy:groovy-all'
+  compileOnly 'org.projectlombok:lombok'
 
   testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
   testCompile 'org.springframework.boot:spring-boot-starter-test'
-  testRuntime 'cglib:cglib-nodep:3.2.5'
+  testRuntime 'cglib:cglib-nodep:3.2.7'
   testRuntime 'org.objenesis:objenesis:2.6'
   testRuntime 'org.apache.httpcomponents:httpclient'
 }
