@@ -9,6 +9,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.nio.charset.Charset
 
@@ -87,7 +88,8 @@ class RequestBodySpec extends Specification {
         response.expectBody(String).isEqualTo('Map')
     }
 
-    def 'Request body should be a Map if it is application/xml'() {
+    @Unroll
+    def 'Request body should be a Map if it is #contentType'() {
         given:
         def requestBody = '''\
 <?xml version="1.0" encoding="utf-8"?>
@@ -97,7 +99,7 @@ class RequestBodySpec extends Specification {
         when:
         def response = client.post()
             .uri('/features/request-body-type')
-            .contentType(MediaType.APPLICATION_XML)
+            .contentType(contentType)
             .body(BodyInserters.fromObject(requestBody))
             .exchange()
 
@@ -105,16 +107,20 @@ class RequestBodySpec extends Specification {
         response.expectStatus().isOk()
         response.expectHeader().contentType(MediaType.TEXT_PLAIN)
         response.expectBody(String).isEqualTo('Map')
+
+        where:
+        contentType << [MediaType.APPLICATION_XML, MediaType.TEXT_XML]
     }
 
-    def 'Request body should be a Map if it is application/xml and charset is not UTF-8'() {
+    @Unroll
+    def 'Request body should be a Map if it is #contentType and charset is not UTF-8'() {
         given:
         def requestBody = '<name>あいうえお</name>'.getBytes(SHIFT_JIS_CHARSET)
 
         when:
         def response = client.post()
             .uri('/features/request-body-type')
-            .contentType(new MediaType(MediaType.APPLICATION_XML, SHIFT_JIS_CHARSET))
+            .contentType(new MediaType(contentType, SHIFT_JIS_CHARSET))
             .body(BodyInserters.fromPublisher(Mono.just(requestBody), byte[]))
             .exchange()
 
@@ -122,6 +128,9 @@ class RequestBodySpec extends Specification {
         response.expectStatus().isOk()
         response.expectHeader().contentType(MediaType.TEXT_PLAIN)
         response.expectBody(String).isEqualTo('Map')
+
+        where:
+        contentType << [MediaType.APPLICATION_XML, MediaType.TEXT_XML]
     }
 
     def 'Request body should be a String if it is text/plain'() {
