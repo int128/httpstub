@@ -1,23 +1,19 @@
 # httpstub [![CircleCI](https://circleci.com/gh/int128/httpstub.svg?style=shield)](https://circleci.com/gh/int128/httpstub) [![Gradle Status](https://gradleupdate.appspot.com/int128/httpstub/status.svg)](https://gradleupdate.appspot.com/int128/httpstub/status)
 
-A HTTP stub server for API testing.
+This is a HTTP stub server for integration test with external APIs.
 
 Key features:
 
-- Easy to run
-- Declarative API definition by YAML
-- Template and pattern matching with Groovy
-- Continuous reload on file change
-
-Architecture:
-
-- Spring Boot 2
-- WebFlux
+- Single JAR
+- Declarative API definition using YAML
+- Template rendering and pattern matching using Groovy
+- File watcher
 
 
 ## Getting Started
 
 Download [the latest release](https://github.com/int128/httpstub/releases).
+Java 8 or later is required.
 
 Define a route as follows:
 
@@ -355,3 +351,9 @@ For example, create `/users.post.yaml` as following:
 ```
 
 Send the request `POST /users` and the stub will return a response after 500 ms.
+
+
+## Contributions
+
+This is an open source software.
+Feel free to open issues and pull requests.
