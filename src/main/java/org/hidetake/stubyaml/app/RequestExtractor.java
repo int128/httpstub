@@ -59,7 +59,7 @@ public class RequestExtractor {
                             throw new RuntimeException(e);
                         }
                     });
-            } else if (APPLICATION_XML.includes(contentType)) {
+            } else if (APPLICATION_XML.includes(contentType) || TEXT_XML.includes(contentType)) {
                 // Convert to String in order to receive non UTF-8 charset
                 return extractBodyAsString(request)
                     .doOnSuccess(string -> requestResponseLogger.logRequest(request, string))
