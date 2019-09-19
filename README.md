@@ -220,7 +220,7 @@ Content type of request | Type of request body
 `application/x-www-form-urlencoded` | `Map<String, String>`
 `multipart/form-data` | `Map<String, Part>`
 `application/json` and subset | `Map<String, Object>`
-`application/xml` and subset | `Map<String, Object>`
+`application/xml` and subset, `text/xml` and subset | `Map<String, Object>`
 `text/*` | `String`
 Otherwise | `null`
 
