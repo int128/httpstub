@@ -16,7 +16,9 @@ dependencies {
   compile 'org.springframework.boot:spring-boot-starter-webflux'
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
   compile 'org.codehaus.groovy:groovy-all'
-  compileOnly 'org.projectlombok:lombok'
+
+  compileOnly 'org.projectlombok:lombok:1.18.10'
+  annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
   testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
