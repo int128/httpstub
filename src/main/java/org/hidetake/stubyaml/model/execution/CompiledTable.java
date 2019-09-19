@@ -2,7 +2,6 @@ package org.hidetake.stubyaml.model.execution;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.val;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Map;
@@ -15,7 +14,7 @@ public class CompiledTable {
     private final Map<String, Object> values;
 
     public Object find(RequestContext requestContext) {
-        val key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContext));
+        final var key = ObjectUtils.nullSafeToString(keyExpression.evaluate(requestContext));
         return values.get(key);
     }
 }

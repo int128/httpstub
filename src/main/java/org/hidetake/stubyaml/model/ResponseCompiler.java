@@ -1,7 +1,6 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledResponse;
 import org.hidetake.stubyaml.model.execution.CompiledResponseBody;
 import org.hidetake.stubyaml.model.yaml.Response;
@@ -36,8 +35,8 @@ public class ResponseCompiler {
     }
 
     private CompiledResponseBody compileBody(Response response, RouteSource source) {
-        val body = response.getBody();
-        val file = response.getFile();
+        final var body = response.getBody();
+        final var file = response.getFile();
         if (body != null && file != null) {
             throw new IllegalStateException("Either body or file must be provided");
         }
@@ -47,21 +46,21 @@ public class ResponseCompiler {
         if (body != null) {
             return new CompiledResponseBody.PrimitiveBody(compilePrimitiveBody(body, source));
         } else {
-            val filenameExpression = expressionCompiler.compileTemplate(file, source);
-            val baseDirectory = source.getFile().getParentFile();
+            final var filenameExpression = expressionCompiler.compileTemplate(file, source);
+            final var baseDirectory = source.getFile().getParentFile();
             return new CompiledResponseBody.FileBody(filenameExpression, baseDirectory);
         }
     }
 
     private Object compilePrimitiveBody(Object body, RouteSource source) {
         if (body instanceof String) {
-            val string = (String) body;
+            final var string = (String) body;
             return expressionCompiler.compileTemplate(string, source);
         } else if (body instanceof List) {
-            val list = (List<?>) body;
+            final var list = (List<?>) body;
             return list.stream().map(item -> compilePrimitiveBody(item, source)).collect(toList());
         } else if (body instanceof Map) {
-            val map = (Map<?, ?>) body;
+            final var map = (Map<?, ?>) body;
             return mapValue(map, item -> compilePrimitiveBody(item, source));
         } else {
             return body;
@@ -69,7 +68,7 @@ public class ResponseCompiler {
     }
 
     private Duration computeDelay(Response response, RouteSource source) {
-        val delay = response.getDelay();
+        final var delay = response.getDelay();
         if (delay >= 0) {
             return Duration.ofMillis(delay);
         } else {

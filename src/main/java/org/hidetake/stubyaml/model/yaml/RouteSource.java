@@ -2,7 +2,6 @@ package org.hidetake.stubyaml.model.yaml;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,11 +22,11 @@ public class RouteSource {
     }
 
     public Optional<Route> parseName(Path basePath) {
-        val relativePath = computeRelativePath(basePath);
-        val m = PATH_PATTERN.matcher(relativePath);
+        final var relativePath = computeRelativePath(basePath);
+        final var m = PATH_PATTERN.matcher(relativePath);
         if (m.matches()) {
             try {
-                val type = Route.RouteType.valueOf(m.group(3).toUpperCase());
+                final var type = Route.RouteType.valueOf(m.group(3).toUpperCase());
                 return Optional.of(new Route(m.group(1), m.group(2), type));
             } catch (IllegalArgumentException e) {
                 log.warn("Ignored route source {}", this);
@@ -39,7 +38,7 @@ public class RouteSource {
     }
 
     public String computeRelativePath(Path basePath) {
-        val relativePath = basePath.relativize(file.toPath());
+        final var relativePath = basePath.relativize(file.toPath());
         return "/" + StreamSupport.stream(relativePath.spliterator(), false)
             .map(Path::toString)
             .collect(Collectors.joining("/"));

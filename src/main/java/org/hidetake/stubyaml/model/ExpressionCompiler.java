@@ -3,7 +3,6 @@ package org.hidetake.stubyaml.model;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyRuntimeException;
 import groovy.lang.Script;
-import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledExpression;
 import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ public class ExpressionCompiler {
             return null;
         }
         try {
-            val clazz = new GroovyClassLoader().parseClass(expression, source.getName());
+            final var clazz = new GroovyClassLoader().parseClass(expression, source.getName());
             return new CompiledExpression((Class<Script>) clazz);
         } catch (GroovyRuntimeException e) {
             throw new IllegalRuleException("Invalid expression: " + expression, source, e);

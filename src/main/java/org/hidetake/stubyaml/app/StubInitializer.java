@@ -3,7 +3,6 @@ package org.hidetake.stubyaml.app;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.val;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +30,7 @@ public class StubInitializer implements InitializingBean {
         Assert.hasText(data, "stub.data must have text");
         Assert.state(intervalSec >= 0, "stub.intervalSec must be 0 or greater");
 
-        val baseDirectory = new File(data);
+        final var baseDirectory = new File(data);
         directoryWatcher.startThread(
             baseDirectory,
             Duration.ofSeconds(intervalSec),

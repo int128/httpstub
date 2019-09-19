@@ -3,7 +3,6 @@ package org.hidetake.stubyaml.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.hidetake.stubyaml.model.execution.RequestContext;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class RequestExtractor {
     private final XmlMapper xmlMapper = new XmlMapper();
 
     public Mono<RequestContext> extract(ServerRequest request) {
-        val builder = RequestContext.builder()
+        final var builder = RequestContext.builder()
             .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())
             .pathVariables(request.pathVariables())
             .requestParams(request.queryParams().toSingleValueMap())
