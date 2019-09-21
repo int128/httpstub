@@ -13,7 +13,7 @@ Key features:
 ## Getting Started
 
 Download [the latest release](https://github.com/int128/httpstub/releases).
-Java 8 or later is required.
+Java 11 or later is required.
 
 Define a route as follows:
 

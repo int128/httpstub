@@ -1,6 +1,5 @@
 package org.hidetake.stubyaml.model;
 
-import lombok.val;
 import org.hidetake.stubyaml.model.yaml.Config;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -19,7 +18,7 @@ public class ConfigCompiler {
     }
 
     private Config parseYaml(File configFile) {
-        try (val yamlStream = new FileInputStream(configFile)) {
+        try (final var yamlStream = new FileInputStream(configFile)) {
             return yamlParser.loadAs(yamlStream, Config.class);
         } catch (IOException e) {
             throw new RuntimeException(e);

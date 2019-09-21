@@ -1,7 +1,6 @@
 package org.hidetake.stubyaml.app;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +38,7 @@ public class DirectoryWatcher {
         while (true) {
             try {
                 handler.run();
-                try (val watchService = FileSystems.getDefault().newWatchService()) {
+                try (final var watchService = FileSystems.getDefault().newWatchService()) {
                     register(watchService, baseDirectory);
                     log.info("Waiting for change of file or directory in {}", baseDirectory.getAbsolutePath());
                     waitForFileChange(watchService);
@@ -75,7 +74,7 @@ public class DirectoryWatcher {
 
     private void waitForFileChange(WatchService watchService) throws InterruptedException {
         while (true) {
-            val watchKey = watchService.take();
+            final var watchKey = watchService.take();
             if (watchKey.pollEvents().stream().anyMatch(event -> event.kind() != OVERFLOW)) {
                 break;
             }

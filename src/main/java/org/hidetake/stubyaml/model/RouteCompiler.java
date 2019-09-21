@@ -1,7 +1,6 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
 import org.hidetake.stubyaml.model.yaml.Route;
@@ -53,8 +52,8 @@ public class RouteCompiler {
     }
 
     private List<Rule> parseYaml(RouteSource routeSource) {
-        try (val yamlStream = new FileInputStream(routeSource.getFile())) {
-            val rules = yamlParser.loadAs(yamlStream, Rule[].class);
+        try (final var yamlStream = new FileInputStream(routeSource.getFile())) {
+            final var rules = yamlParser.loadAs(yamlStream, Rule[].class);
             if (rules == null) {
                 return emptyList();
             } else {
@@ -68,7 +67,7 @@ public class RouteCompiler {
     }
 
     private static RequestPredicate requestPredicate(RouteSource routeSource, Route route) {
-        val httpMethodName = route.getMethod().toUpperCase();
+        final var httpMethodName = route.getMethod().toUpperCase();
         try {
             return method(HttpMethod.valueOf(httpMethodName)).and(path(route.getRequestPath()));
         } catch (IllegalArgumentException e) {

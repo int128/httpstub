@@ -2,7 +2,6 @@ package org.hidetake.stubyaml.app;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.springframework.http.HttpStatus;
@@ -52,8 +51,8 @@ public class RouteRegistrar {
 
     private RouterFunction<ServerResponse> stubResponse(File baseDirectory) throws IOException {
         log.info("Scanning files in {}", baseDirectory.getAbsolutePath());
-        val exceptions = new ArrayList<Exception>();
-        val functions = Files.walk(baseDirectory.toPath())
+        final var exceptions = new ArrayList<Exception>();
+        final var functions = Files.walk(baseDirectory.toPath())
             .filter(path -> path.toFile().isFile())
             .map(path -> new RouteSource(path.toFile()))
             .flatMap(routeSource -> {
@@ -73,7 +72,7 @@ public class RouteRegistrar {
 
     private static RouterFunction<ServerResponse> indexResponse(List<RouterFunction<ServerResponse>> functions, List<Exception> exceptions) {
         // TODO: Thymeleaf
-        val status = String.format(
+        final var status = String.format(
             "## %d ERROR(S)\n\n%s\n\n## %d ROUTE(S)\n\n%s",
             exceptions.size(),
             String.join("\n----\n", exceptions.stream().map(Throwable::toString).collect(toList())),

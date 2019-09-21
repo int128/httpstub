@@ -2,7 +2,6 @@ package org.hidetake.stubyaml.app;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ public class RequestResponseLogger {
             if (map != null) {
                 map.forEach((key, values) -> values.forEach(value -> {
                     if (value instanceof Part) {
-                        val part = (Part) value;
+                        final var part = (Part) value;
                         part.headers().forEach((headerKey, headerValues) -> headerValues.forEach(headerValue ->
                             log.info("{} [{}] {}: {}", RECEIVED, key, headerKey, headerValue)));
                     } else {
@@ -61,7 +60,7 @@ public class RequestResponseLogger {
 
     public void logResponse(ServerResponse response, @Nullable String body) {
         if (configHolder.getConfig().getLogging().isHeaders()) {
-            val status = response.statusCode();
+            final var status = response.statusCode();
             log.info("{} {} {}", SENT, status.value(), status.getReasonPhrase());
             response.headers().forEach((key, values) ->
                 values.forEach(value -> log.info("{} {}: {}", SENT, key, value)));
