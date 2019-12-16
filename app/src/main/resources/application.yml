@@ -1,0 +1,13 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    org.apache.http.wire: INFO
+    org.hidetake.stubyaml: ${APP_LOG_LEVEL:INFO}
+
+stub:
+  data: ${STUB_DATA:data}
+  interval-sec: 3
+  watcher-enabled: true

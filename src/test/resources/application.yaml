@@ -1,4 +1,0 @@
-logging:
-  level:
-    # RestTemplate headers and body
-    org.apache.http.wire: DEBUG

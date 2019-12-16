@@ -1,0 +1,12 @@
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/json
+      body: |
+        [
+          {
+            "id": 1,
+            "name": "client1"
+          }
+        ]

@@ -1,0 +1,19 @@
+apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+dependencies {
+  compile project(':api')
+  compile 'org.yaml:snakeyaml'
+  compile 'org.springframework.boot:spring-boot-starter-webflux'
+  compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+  compile 'org.codehaus.groovy:groovy-all'
+  compile 'com.google.guava:guava:28.1-jre'
+
+  testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+  testCompile 'org.springframework.boot:spring-boot-starter-test'
+  testRuntime 'cglib:cglib-nodep:3.2.7'
+  testRuntime 'org.objenesis:objenesis:2.6'
+  testRuntime 'org.apache.httpcomponents:httpclient'
+}
