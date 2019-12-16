@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CompiledRule {
+
     private final CompiledExpression when;
     private final CompiledResponse response;
 
@@ -17,4 +18,5 @@ public class CompiledRule {
             return (result instanceof Boolean) && (Boolean) result;
         }
     }
+
 }

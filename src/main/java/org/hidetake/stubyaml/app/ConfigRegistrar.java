@@ -8,14 +8,16 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class ConfigRegistrar {
+
     private final ConfigHolder configHolder;
     private final ConfigCompiler configCompiler;
 
+    //TODO: #RESOURCE_TAG change folder to new class Resource(it could be local or remote file)
     public void register(File baseDirectory) {
-        final var configFile = new File(baseDirectory, "config.yaml");
+        final var configFile = parseConfig(baseDirectory);
         if (configFile.exists()) {
             try {
                 final var config = configCompiler.compile(configFile);
@@ -29,4 +31,12 @@ public class ConfigRegistrar {
             configHolder.reset();
         }
     }
+
+    private File parseConfig(File baseDirectory) {
+        File yaml = new File(baseDirectory, "config.yaml");
+        File yml = new File(baseDirectory, "config.yml");
+
+        return !yaml.exists() ? yml : yaml;
+    }
+
 }

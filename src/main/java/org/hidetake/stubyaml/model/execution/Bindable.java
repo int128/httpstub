@@ -1,7 +1,11 @@
 package org.hidetake.stubyaml.model.execution;
 
-import groovy.lang.Binding;
+import java.util.Map;
 
 public interface Bindable {
-    Binding getBinding();
+
+    Map getBinding();
+
+    Map createBinding();
+
 }

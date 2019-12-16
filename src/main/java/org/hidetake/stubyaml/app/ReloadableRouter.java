@@ -10,9 +10,11 @@ import static org.springframework.web.reactive.function.server.ServerResponse.st
 
 @Component
 public class ReloadableRouter implements RouterFunction<ServerResponse> {
+
     private volatile RouterFunction<ServerResponse> current =
         RouterFunctions.route(
-            all(), request -> status(INTERNAL_SERVER_ERROR).syncBody("Initializing..."));
+            all(), request -> status(INTERNAL_SERVER_ERROR)
+                .syncBody("Initializing..."));
 
     public void reload(RouterFunction<ServerResponse> routerFunction) {
         current = routerFunction;
@@ -22,4 +24,5 @@ public class ReloadableRouter implements RouterFunction<ServerResponse> {
     public Mono<HandlerFunction<ServerResponse>> route(ServerRequest request) {
         return current.route(request);
     }
+
 }

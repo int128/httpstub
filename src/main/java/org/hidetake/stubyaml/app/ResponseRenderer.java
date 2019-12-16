@@ -21,9 +21,10 @@ import java.io.IOException;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class ResponseRenderer {
+
     private final RequestResponseLogger requestResponseLogger;
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
@@ -85,4 +86,5 @@ public class ResponseRenderer {
             return body.toString();
         }
     }
+
 }

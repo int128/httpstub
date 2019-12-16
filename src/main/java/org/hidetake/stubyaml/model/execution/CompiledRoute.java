@@ -10,12 +10,15 @@ import java.util.Optional;
 @Data
 @Builder
 public class CompiledRoute {
+
     private final RequestPredicate requestPredicate;
     private final List<CompiledRule> rules;
 
+    // TODO: change findFirst to something with order
     public Optional<CompiledRule> findRule(RequestContext requestContext) {
         return rules.stream()
             .filter(rule -> rule.matches(requestContext))
             .findFirst();
     }
+
 }

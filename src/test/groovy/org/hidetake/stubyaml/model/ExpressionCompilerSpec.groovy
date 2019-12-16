@@ -1,6 +1,6 @@
 package org.hidetake.stubyaml.model
 
-import org.hidetake.stubyaml.model.yaml.RouteSource
+import org.hidetake.stubyaml.model.yaml.FilenameRouteSource
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -10,8 +10,8 @@ class ExpressionCompilerSpec extends Specification {
     @Unroll
     def 'Template #template should produce #value on evaluated'() {
         when:
-        def source = new RouteSource(new File('/README.md'))
-        def compiledExpression = expressionCompiler.compileTemplate(template, source)
+        def source = new FilenameRouteSource(new File('/README.md'))
+        def compiledExpression = expressionCompiler.compileTemplate(template)
 
         then:
         compiledExpression?.evaluate {-> new Binding()} == value

@@ -24,14 +24,16 @@ vim data/users.get.yaml
 
 ```yaml
 # data/users.get.yaml
-- response:
-    headers:
-      content-type: application/json
-    body:
-      - id: 1
-        name: Foo
-      - id: 2
-        name: Bar
+version: v1.1
+rules: 
+  - response:
+      headers:
+        content-type: application/json
+      body:
+        - id: 1
+          name: Foo
+        - id: 2
+          name: Bar
 ```
 
 Run the application:
@@ -156,17 +158,19 @@ You can set multiple values.
 You can serve a text body as follows:
 
 ```yaml
-- response:
-    headers:
-      content-type: application/xml
-    body: |
-      <?xml version="1.0" encoding="UTF-8"?>
-      <users>
-        <user>
-          <id>1</id>
-          <name>Foo</name>
-        </user>
-      </users>
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/xml
+      body: |
+        <?xml version="1.0" encoding="UTF-8"?>
+        <users>
+          <user>
+            <id>1</id>
+            <name>Foo</name>
+          </user>
+        </users>
 ```
 
 You can serve a JSON body as follows:
@@ -183,19 +187,23 @@ You can serve a JSON body as follows:
 If a character set is specified in the `content-type` header, the response body is encoded to the character set.
 
 ```yaml
-- response:
-    headers:
-      content-type: text/plain;charset=Shift_JIS
-    body: あいうえお
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: text/plain;charset=Shift_JIS
+      body: あいうえお
 ```
 
 You can serve a file content as follows:
 
 ```yaml
-- response:
-    headers:
-      content-type: image/jpeg
-    file: photo.jpg
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: image/jpeg
+      file: photo.jpg
 ```
 
 
@@ -231,12 +239,14 @@ Otherwise | `null`
 For example, create `/users/{userId}.get.yaml` as following:
 
 ```yaml
-- response:
-    headers:
-      content-type: application/json
-    body:
-      id: ${path.userId}
-      name: User${path.userId}
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/json
+      body:
+        id: ${path.userId},
+        name: User${path.userId}
 ```
 
 The stub will return the following response on the request `GET /users/100`:
@@ -257,17 +267,19 @@ The stub evaluates each `when` of all rules and returns the first matched `respo
 Here is the example of `/numbers.get.yaml` as follows:
 
 ```yaml
-- when: params.order == 'desc'
-  response:
-    headers:
-      content-type: application/json
-    body: [3, 2, 1]
-
-- when: params.order == 'asc'
-  response:
-    headers:
-      content-type: application/json
-    body: [1, 2, 3]
+version: v1.1
+rules:
+  - when: params.order == 'desc'
+    response:
+      headers:
+        content-type: application/json
+      body: [3, 2, 1]
+  
+  - when: params.order == 'asc'
+    response:
+      headers:
+        content-type: application/json
+      body: [1, 2, 3]
 ```
 
 The stub will return the following response on the request `GET /numbers?order=asc`:
@@ -322,26 +334,28 @@ Request condition: `path.userId` | Response variable: `tables.userName` | Respon
 Create `/users/{userId}.get.yaml` with following rule.
 
 ```yaml
-- response:
-    headers:
-      content-type: application/json
-    body:
-      id: ${path.userId}
-      name: ${tables.userName}
-      age: ${tables.age}
-    tables:
-    - name: userName
-      key: path.userId
-      values:
-        1: Foo
-        2: Bar
-        3: Baz
-    - name: age
-      key: path.userId
-      values:
-        1: 35
-        2: 100
-        3: 3
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/json
+      body:
+        id: ${path.userId}
+        name: ${tables.userName}
+        age: ${tables.age}
+      tables:
+      - name: userName
+        key: path.userId
+        values:
+          1: Foo
+          2: Bar
+          3: Baz
+      - name: age
+        key: path.userId
+        values:
+          1: 35
+          2: 100
+          3: 3
 ```
 
 The stub will return the following response on the request `GET /users/1`:
@@ -372,16 +386,26 @@ Use `delay` attribute in milliseconds to simulate network latency.
 For example, create `/users.post.yaml` as following:
 
 ```yaml
-- response:
-    delay: 500
-    headers:
-      content-type: application/json
-    body:
-      id: 1
+version: v1.1
+rules:
+  - response:
+      delay: 500
+      headers:
+        content-type: application/json
+      body:
+        id: 1
 ```
 
 Send the request `POST /users` and the stub will return a response after 500 ms.
 
+## Versioning
+
+After 12.2019 for backward compatibilities added version to config files. Config files introduction of a versioning system for further development and addition of new features.
+
+Variable    | Object
+------------|-------
+`v1.0`      | Old version of project
+`v1.1`      | Added RuleContainer
 
 ## Contributions
 

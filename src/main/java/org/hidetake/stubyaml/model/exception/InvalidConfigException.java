@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml.model;
+package org.hidetake.stubyaml.model.exception;
 
 import org.yaml.snakeyaml.error.YAMLException;
 

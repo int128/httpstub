@@ -1,15 +1,16 @@
 package org.hidetake.stubyaml.model.execution;
 
-import groovy.lang.Binding;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
 @Builder
 public class RequestContext implements Bindable {
+
     private final Map<String, String> requestHeaders;
     private final Map<String, String> pathVariables;
     private final Map<String, String> requestParams;
@@ -17,15 +18,18 @@ public class RequestContext implements Bindable {
     private final Map<String, Object> constants;
 
     @Getter(lazy = true)
-    private final Binding binding = createBinding();
+    private final Map binding = createBinding();
 
-    Binding createBinding() {
-        final var binding = new Binding();
-        binding.setVariable("headers", requestHeaders);
-        binding.setVariable("path", pathVariables);
-        binding.setVariable("params", requestParams);
-        binding.setVariable("body", requestBody);
-        binding.setVariable("constants", constants);
-        return binding;
+    @Override
+    public Map createBinding() {
+        final var output = new LinkedHashMap<>();
+        output.put("headers", requestHeaders);
+        output.put("path", pathVariables);
+        output.put("params", requestParams);
+        output.put("body", requestBody);
+        output.put("constants", constants);
+
+        return output;
     }
+
 }

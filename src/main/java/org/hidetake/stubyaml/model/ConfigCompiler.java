@@ -1,29 +1,21 @@
 package org.hidetake.stubyaml.model;
 
+import lombok.RequiredArgsConstructor;
 import org.hidetake.stubyaml.model.yaml.Config;
+import org.hidetake.stubyaml.service.ObjectCompiler;
+import org.hidetake.stubyaml.service.Parser;
 import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 @Component
-public class ConfigCompiler {
-    private final Yaml yamlParser = new Yaml();
+@RequiredArgsConstructor
+public class ConfigCompiler implements ObjectCompiler {
+
+    private final Parser parser;
 
     public Config compile(File configFile) {
-        return parseYaml(configFile);
+        return parser.parse(configFile, Config.class);
     }
 
-    private Config parseYaml(File configFile) {
-        try (final var yamlStream = new FileInputStream(configFile)) {
-            return yamlParser.loadAs(yamlStream, Config.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (YAMLException e) {
-            throw new InvalidConfigException(configFile, e);
-        }
-    }
 }

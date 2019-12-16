@@ -1,4 +1,4 @@
-package org.hidetake.stubyaml.model;
+package org.hidetake.stubyaml.model.exception;
 
 import lombok.Getter;
 import org.hidetake.stubyaml.model.yaml.RouteSource;

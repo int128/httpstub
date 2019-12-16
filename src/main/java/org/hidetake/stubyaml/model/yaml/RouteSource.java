@@ -1,46 +1,15 @@
 package org.hidetake.stubyaml.model.yaml;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-@Slf4j
-@Data
-public class RouteSource {
-    private static final Pattern PATH_PATTERN = Pattern.compile("(.+)\\.(.+?)\\.(.+?)$");
+public interface RouteSource {
 
-    private final File file;
+    File getFile();
 
-    public String getName() {
-        return file.getPath();
-    }
+    String getName();
 
-    public Optional<Route> parseName(Path basePath) {
-        final var relativePath = computeRelativePath(basePath);
-        final var m = PATH_PATTERN.matcher(relativePath);
-        if (m.matches()) {
-            try {
-                final var type = Route.RouteType.valueOf(m.group(3).toUpperCase());
-                return Optional.of(new Route(m.group(1), m.group(2), type));
-            } catch (IllegalArgumentException e) {
-                log.warn("Ignored route source {}", this);
-                return Optional.empty();
-            }
-        } else {
-            return Optional.empty();
-        }
-    }
+    Optional<Route> parseName(Path basePath);
 
-    public String computeRelativePath(Path basePath) {
-        final var relativePath = basePath.relativize(file.toPath());
-        return "/" + StreamSupport.stream(relativePath.spliterator(), false)
-            .map(Path::toString)
-            .collect(Collectors.joining("/"));
-    }
 }

@@ -16,8 +16,10 @@ import static java.nio.file.StandardWatchEventKinds.*;
 @Slf4j
 @Component
 public class DirectoryWatcher {
+
     /**
      * Run {@link #watch(File, Duration, Runnable)} in another thread.
+     *
      * @param baseDirectory
      * @param wait
      * @param handler
@@ -30,6 +32,7 @@ public class DirectoryWatcher {
     /**
      * Run the handler, wait for file change and interval.
      * This function exits if {@link InterruptedException} is occurred.
+     *
      * @param baseDirectory
      * @param interval
      * @param handler
@@ -80,4 +83,5 @@ public class DirectoryWatcher {
             }
         }
     }
+
 }
