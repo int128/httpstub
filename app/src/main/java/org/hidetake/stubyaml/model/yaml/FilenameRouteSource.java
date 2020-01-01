@@ -40,7 +40,7 @@ public class FilenameRouteSource implements RouteSource {
                     .type(type)
                     .build());
             } catch (IllegalArgumentException e) {
-                log.warn("Ignored route source {}", this);
+                log.warn("Ignored route source {}, message {}", this, e.getMessage());
                 return Optional.empty();
             }
         } else {

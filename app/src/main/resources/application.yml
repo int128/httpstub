@@ -8,6 +8,7 @@ logging:
     org.hidetake.stubyaml: ${APP_LOG_LEVEL:INFO}
 
 stub:
+  admin-prefix: ${ADMIN-PREFIX:/admin}
   data: ${STUB_DATA:data}
   interval-sec: 3
   watcher-enabled: true

@@ -2,5 +2,4 @@ rootProject.name = 'httpstub'
 
 include 'app'
 include 'gradle-plugin'
-include 'api'
 

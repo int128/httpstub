@@ -13,7 +13,8 @@ public class Route {
 
     public enum RouteType {
 
-        YAML
+        YAML,
+        YML
 
     }
 

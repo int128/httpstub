@@ -2,18 +2,36 @@ apply plugin: 'groovy'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-  compile project(':api')
-  compile 'org.yaml:snakeyaml'
-  compile 'org.springframework.boot:spring-boot-starter-webflux'
-  compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  compile 'org.codehaus.groovy:groovy-all'
-  compile 'com.google.guava:guava:28.1-jre'
+ext {
+  snakeyamlVersion = '1.19'
+  jacksonVersion = '2.9.6'
+  groovyVersion = '2.4.15'
+}
 
-  testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
-  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
-  testCompile 'org.springframework.boot:spring-boot-starter-test'
+dependencies {
+  implementation "org.yaml:snakeyaml:$snakeyamlVersion"
+  implementation "org.springframework.boot:spring-boot-starter-webflux:$springBootVersion"
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
+  implementation "org.codehaus.groovy:groovy-all:$groovyVersion"
+  implementation "com.google.guava:guava:$guavaVersion"
+
+  testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+  testImplementation 'org.spockframework:spock-spring:1.1-groovy-2.4'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
   testRuntime 'cglib:cglib-nodep:3.2.7'
   testRuntime 'org.objenesis:objenesis:2.6'
   testRuntime 'org.apache.httpcomponents:httpclient'
 }
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+      artifact(sourcesJar) {
+        classifier = 'sources'
+      }
+    }
+  }
+}
+

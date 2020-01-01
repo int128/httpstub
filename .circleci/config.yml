@@ -19,9 +19,9 @@ jobs:
           - v2-dependencies-
       - run: ./gradlew build
       - store_test_results:
-          path: build/test-results/test
+          path: app/build/test-results/test
       - store_artifacts:
-          path: build/reports
+          path: app/build/reports
       - save_cache:
           paths:
             - ~/.gradle/caches
@@ -29,7 +29,7 @@ jobs:
           key: v2-dependencies-{{ checksum "build.gradle" }}
       - run: |
           if [ "$CIRCLE_TAG" ]; then
-            ghr -u int128 -r httpstub -n "$CIRCLE_TAG" -b "Released on $(date +%Y-%m-%d)" "$CIRCLE_TAG" build/libs/httpstub.jar
+            ghr -u int128 -r httpstub -n "$CIRCLE_TAG" -b "Released on $(date +%Y-%m-%d)" "$CIRCLE_TAG" app/build/libs/httpstub.jar
           fi
 
 workflows:

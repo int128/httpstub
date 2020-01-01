@@ -1,7 +1,8 @@
 buildscript {
-  
+
   ext {
     springBootVersion = '2.0.3.RELEASE'
+    guavaVersion = '28.1-jre'
   }
 
   repositories {
@@ -12,7 +13,7 @@ buildscript {
   dependencies {
     classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
   }
-  
+
 }
 
 version = '1.0.0-SNAPSHOT'
@@ -21,6 +22,10 @@ group = 'org.hidetake.stubyaml'
 subprojects {
 
   apply plugin: 'java'
+  apply plugin: 'maven-publish'
+
+  group = parent.group
+  version = parent.version
 
   sourceCompatibility = '11'
   targetCompatibility = '11'
@@ -33,6 +38,11 @@ subprojects {
   dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.10'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+  }
+
+  task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
   }
 
 }
