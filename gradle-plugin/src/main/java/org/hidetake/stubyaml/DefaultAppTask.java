@@ -6,18 +6,16 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 
-import java.io.File;
+import java.io.IOException;
+import java.net.Socket;
 
 @Data
 public class DefaultAppTask extends DefaultTask {
 
     @Internal
     protected final Logger log;
-
     @Input
-    public String lockFileName = ".httpstub.lock";
-    @Input
-    public String adminPrefix = "/admin";
+    public String appPort = "8080";
 
     public DefaultAppTask() {
         super();
@@ -26,9 +24,12 @@ public class DefaultAppTask extends DefaultTask {
         log = super.getLogger();
     }
 
-    @Internal
-    protected File getLockFile() {
-        return new File(lockFileName);
+    protected boolean isPortAvailable(String port) {
+        try (Socket ignored = new Socket("127.0.0.1", Integer.valueOf(port))) {
+            return false;
+        } catch (IOException ignored) {
+            return true;
+        }
     }
 
 }

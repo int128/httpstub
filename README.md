@@ -8,6 +8,7 @@ Key features:
 - Declarative API definition using YAML
 - Template rendering and pattern matching using Groovy
 - File watcher
+- Gradle plugin
 
 
 ## Getting Started
@@ -34,6 +35,20 @@ rules:
           name: Foo
         - id: 2
           name: Bar
+```
+
+Or even simpler, with an old declaration
+
+```yaml
+# data/users.get.yaml
+- response:
+    headers:
+      content-type: application/json
+    body:
+      - id: 1
+        name: Foo
+      - id: 2
+        name: Bar
 ```
 
 Run the application:

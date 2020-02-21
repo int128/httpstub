@@ -1,18 +1,5 @@
 apply plugin: 'java-gradle-plugin'
 
-configurations {
-  pluginCompile {
-    transitive = false
-  }
-}
-
-sourceSets {
-  main.compileClasspath += configurations.pluginCompile
-  main.runtimeClasspath += configurations.pluginCompile
-  test.compileClasspath += configurations.pluginCompile
-  test.runtimeClasspath += configurations.pluginCompile
-}
-
 dependencies {
   runtime project(':app')
   compile gradleApi()
@@ -42,9 +29,6 @@ model {
 }
 
 jar {
-  baseName 'patch-plugin'
+  baseName 'httpstub-plugin'
   zip64 true
-  from {
-    configurations.pluginCompile.collect { it.isDirectory() ? it : zipTree(it) }
-  }
 }

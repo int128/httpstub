@@ -20,19 +20,19 @@ public class ClasspathFinder {
 
     public static final String JAR_PACKAGE = "org/hidetake/stubyaml";
     public static final String JAR_NAME = "app";
+    public static final String JAVA_CONFIGURATION = "classpath";
+
     private final Project project;
 
     @SneakyThrows
     public File find() {
-        Set<URL> buildScriptUrls;
+        Set<URL> classpath = Collections.emptySet();
 
         if(project.getPluginManager().hasPlugin("java")) {
-            buildScriptUrls = loadHttpstubFromBuildScript();
-        } else {
-            buildScriptUrls = Collections.emptySet();
+            classpath = loadHttpstubFromBuildScript(JAVA_CONFIGURATION);
         }
 
-        List<URL> urls = buildScriptUrls.stream()
+        List<URL> urls = classpath.stream()
             .filter(url -> url.getFile().contains(JAR_PACKAGE))
             .filter(url -> url.getFile().contains(JAR_NAME))
             .collect(Collectors.toList());
@@ -48,9 +48,9 @@ public class ClasspathFinder {
 
     /* ===================== */
 
-    private Set<URL> loadHttpstubFromBuildScript() throws IOException {
+    private Set<URL> loadHttpstubFromBuildScript(String classpath) throws IOException {
         Set<URL> urls = new HashSet<>();
-        Configuration byName = project.getBuildscript().getConfigurations().getByName("classpath");
+        Configuration byName = project.getBuildscript().getConfigurations().getByName(classpath);
         if(Objects.nonNull(byName)) {
             ResolvedConfiguration resolvedConfiguration =
                 byName.getResolvedConfiguration();
