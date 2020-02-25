@@ -12,10 +12,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import java.util.Arrays;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
+@Component
 public class RequestResponseLogger {
-
     private static final String RECEIVED = ">";
     private static final String SENT = "<";
 
@@ -74,5 +73,4 @@ public class RequestResponseLogger {
             }
         }
     }
-
 }

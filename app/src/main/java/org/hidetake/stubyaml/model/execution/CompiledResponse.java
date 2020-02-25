@@ -13,7 +13,6 @@ import static org.springframework.util.ObjectUtils.nullSafeToString;
 @Data
 @Builder
 public class CompiledResponse {
-
     private final int status;
     private final MultiValueMap<String, CompiledExpression> headers;
     private final CompiledResponseBody<?> body;
@@ -28,5 +27,4 @@ public class CompiledResponse {
         return mapMultiValue(headers, expression ->
             nullSafeToString(expression.evaluate(responseContext)));
     }
-
 }
