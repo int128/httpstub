@@ -10,5 +10,5 @@ logging:
 stub:
   admin-prefix: ${ADMIN-PREFIX:/admin}
   data: ${STUB_DATA:data}
-  interval-sec: 3
-  watcher-enabled: true
+  interval-sec: ${WATCH_INTERVAL:3}
+  watcher-enabled: ${WATCH_ENABLED:true}

@@ -413,6 +413,29 @@ rules:
 
 Send the request `POST /users` and the stub will return a response after 500 ms.
 
+## Gradle plugin
+
+You can connect this application as a gradle plugin to your's e2e tests or ci.   
+Configure your project as show below
+
+```groovy
+buildscript {
+	dependencies {
+		classpath 'org.hidetake.stubyaml:gradle-plugin:1.0.0-SNAPSHOT'
+	}
+}
+
+apply plugin: 'org.hidetake.stubyaml'
+
+httpstub {
+	serverPort = '8078'  //port where httpstub will run
+	stubData = 'src/test/resources/stubs' //folder where stored configs
+}
+```
+
+`gradle httpstubStart` - to start stub server   
+`gradle httpstubStop` - to stop stub server
+
 ## Versioning
 
 After 12.2019 for backward compatibilities added version to config files. Config files introduction of a versioning system for further development and addition of new features.
