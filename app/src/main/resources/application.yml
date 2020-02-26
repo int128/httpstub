@@ -3,7 +3,8 @@ server:
 
 logging:
   level:
-    root: INFO
+    root: ${LOG_LEVEL:INFO}
+    org.springframework.web: ${WEB_LOG_LEVEL:INFO}
     org.apache.http.wire: INFO
     org.hidetake.stubyaml: ${APP_LOG_LEVEL:INFO}
 

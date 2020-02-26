@@ -12,4 +12,12 @@ public class StringUtils {
         return () -> String.format(text, args);
     }
 
+    public static boolean isEmpty(Object text) {
+        return text == null || nullToEmpty(text).length() == 0;
+    }
+
+    public static String nullToEmpty(Object object) {
+        return object == null ? "" : object.toString();
+    }
+
 }

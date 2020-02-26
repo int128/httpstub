@@ -130,7 +130,7 @@ class StubSpec extends Specification {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.MULTIPART_FORM_DATA)
         def body = new LinkedMultiValueMap()
-        def image = new FileSystemResource('data/users/{userId}/photo.jpg')
+        def image = new FileSystemResource('src/test/resources/data/users/{userId}/photo.jpg')
         body.add('file', image)
         def request = new HttpEntity(body, headers)
 

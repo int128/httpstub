@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hidetake.stubyaml.model.RouteCompiler;
 import org.hidetake.stubyaml.model.yaml.FilenameRouteSource;
 import org.hidetake.stubyaml.model.yaml.RouteSource;
+import org.hidetake.stubyaml.util.ExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -70,7 +71,9 @@ public class RouteRegistrar {
     }
 
     //TODO: #RESOURCE_TAG
-    private Function<RouteSource, Stream<? extends RouterFunction<ServerResponse>>> compile(File baseDirectory, ArrayList<Exception> exceptions) {
+    private Function<RouteSource, Stream<? extends RouterFunction<ServerResponse>>> compile(
+        File baseDirectory,
+        List<Exception> exceptions) {
         return routeSource -> {
             try {
                 return routeCompiler.compile(routeSource, baseDirectory)
@@ -86,12 +89,13 @@ public class RouteRegistrar {
     }
 
     // TODO: Thymeleaf or groovy
-    private static RouterFunction<ServerResponse> indexResponse(List<RouterFunction<ServerResponse>> functions, List<Exception> exceptions) {
+    private static RouterFunction<ServerResponse> indexResponse(List<RouterFunction<ServerResponse>> functions,
+                                                                List<Exception> exceptions) {
         final var status = String.format(
             "## %d ERROR(S)\n\n%s\n\n## %d ROUTE(S)\n\n%s",
             exceptions.size(),
             String.join("\n----\n", exceptions.stream()
-                .map(Throwable::toString)
+                .map(ExceptionUtils::toChain)
                 .collect(toList())),
             functions.size(),
             String.join("\n", functions.stream()

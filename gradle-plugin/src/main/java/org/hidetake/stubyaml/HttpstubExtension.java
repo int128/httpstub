@@ -18,6 +18,8 @@ public class HttpstubExtension {
     private String watchInterval = "5";
     private String watchEnabled = "true";
     private String loggingFile;
+    private String logLevel;
+    private String webLogLevel;
     //plugin settings
     private String awaitedLine = "OK";
     private Long taskTimeout = 10L;
@@ -31,6 +33,8 @@ public class HttpstubExtension {
             ,"WATCH_INTERVAL", watchInterval
             ,"WATCH_ENABLED", watchEnabled
             ,"logging.file", loggingFile
+            ,"LOG_LEVEL", logLevel
+            ,"WEB_LOG_LEVEL", webLogLevel
         );
 
         return map.entrySet().stream()
