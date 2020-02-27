@@ -436,6 +436,10 @@ httpstub {
 `gradle httpstubStart` - to start stub server   
 `gradle httpstubStop` - to stop stub server
 
+## Troubleshooting
+If you see in logs next exception `java.io.IOException: User limit of inotify watches reached` don't afraid
+just execute `echo 16384 | sudo tee /proc/sys/fs/inotify/max_user_watches` on your linux machine 
+
 ## Versioning
 
 After 12.2019 for backward compatibilities added version to config files. Config files introduction of a versioning system for further development and addition of new features.

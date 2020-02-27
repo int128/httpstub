@@ -28,16 +28,31 @@ subprojects {
   version = parent.version
 
   sourceCompatibility = '11'
-  targetCompatibility = '11'
+
+  compileJava {
+    options.compilerArgs = [
+      "--release", "8"
+    ]
+  }
 
   repositories {
     mavenCentral()
     jcenter()
+    maven {
+      url 'https://jitpack.io'
+    }
   }
 
   dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.10'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.2.0') {
+      exclude group: 'net.bytebuddy', module: 'byte-buddy'
+      exclude group: 'net.bytebuddy', module: 'byte-buddy-agent'
+    }
+
+    annotationProcessor 'net.bytebuddy:byte-buddy:1.10.8'
+    annotationProcessor 'net.bytebuddy:byte-buddy-agent:1.10.8'
   }
 
   task sourcesJar(type: Jar, dependsOn: classes) {

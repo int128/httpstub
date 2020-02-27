@@ -5,17 +5,15 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class HttpstubStopTask extends AbstractTask {
 
     @TaskAction
     public void stop() {
         var extension = getProject().getExtensions().getByType(HttpstubExtension.class);
-        if(isPortAvailable(extension.getServerPort())) {
+        if (isPortAvailable(extension.getServerPort())) {
             log.warn("Httpstub doesn't work on port {}", extension.getServerPort());
             return;
         }
@@ -35,17 +33,17 @@ public class HttpstubStopTask extends AbstractTask {
         }
     }
 
-    private void sendGet(String url) throws IOException, InterruptedException {
-        HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_1_1)
-            .build();
+    private void sendGet(String address) throws IOException{
+        URL url = new URL(address);
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .GET()
-            .uri(URI.create(url))
-            .build();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
 
-        httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+        con.setRequestProperty("Content-Type", "application/json; utf-8");
+        con.setRequestProperty("Accept", "application/json");
+
+        con.setDoOutput(true);
+        con.getResponseCode();
     }
 
 }
