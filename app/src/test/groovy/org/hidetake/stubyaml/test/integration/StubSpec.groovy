@@ -173,4 +173,50 @@ class StubSpec extends Specification {
         ['application/json'] in clients.headers.values()
     }
 
+    def 'POST /request-body-array should return array from request body'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_JSON)
+        def body = [
+            [
+                data: [
+                    mykey: "myvalue"
+                ]
+            ]
+        ]
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def response = restTemplate.postForEntity('/features/request-body-array', request, Map)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 1
+        response.body == ['data-from-backend': 'myvalue']
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+    }
+
+    def 'POST /response-json-serialize should return serialized json in output field'() {
+        given:
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_JSON)
+        def body = [
+            data: [
+                mykey2: "myvalue2"
+            ]
+        ]
+        def request = new HttpEntity(body, headers)
+
+        when:
+        def response = restTemplate.postForEntity('/features/response-json-serialize', request, Map)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 1
+        response.body == ['data-from-backend': [mykey2: "myvalue2"]]
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+    }
+
 }

@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 import static org.springframework.http.MediaType.*;
@@ -32,6 +33,7 @@ public class RequestExtractor {
             .pathVariables(request.pathVariables())
             .requestParams(request.queryParams().toSingleValueMap())
             .constants(configHolder.getConfig().getConstants());
+
         return extractBody(request)
             .map(body -> builder.requestBody(body).build())
             .switchIfEmpty(Mono.fromSupplier(builder::build));
@@ -53,9 +55,9 @@ public class RequestExtractor {
                     .doOnSuccess(string -> requestResponseLogger.logRequest(request, string))
                     .map(string -> {
                         try {
-                            return objectMapper.readValue(string, Map.class);
+                            return objectMapper.readValue(string, Object.class);
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                     });
             } else if (APPLICATION_XML.includes(contentType) || TEXT_XML.includes(contentType)) {

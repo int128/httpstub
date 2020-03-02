@@ -1,0 +1,3 @@
+moduleName=json-module
+moduleVersion=1.0
+extensionClasses=org.hidetake.stubyaml.extension.JsonExtension

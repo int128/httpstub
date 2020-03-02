@@ -1,0 +1,7 @@
+- response:
+    headers:
+      content-type: application/json
+    body: |-
+      {
+        "data-from-backend": ${body.data.toJson()}
+      }

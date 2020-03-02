@@ -3,6 +3,7 @@ buildscript {
   ext {
     springBootVersion = '2.2.4.RELEASE'
     guavaVersion = '28.1-jre'
+    groovyVersion = '3.0.1'
   }
 
   repositories {
@@ -36,6 +37,7 @@ subprojects {
   }
 
   repositories {
+    mavenLocal()
     mavenCentral()
     jcenter()
     maven {
