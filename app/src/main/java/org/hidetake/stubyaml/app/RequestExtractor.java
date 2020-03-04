@@ -27,6 +27,7 @@ public class RequestExtractor {
     private final ObjectMapper objectMapper;
     private final XmlMapper xmlMapper = new XmlMapper();
 
+    //TODO: Try to detect numbers in parsed values, for integers matching
     public Mono<RequestContext> extract(ServerRequest request) {
         final var builder = RequestContext.builder()
             .requestHeaders(request.headers().asHttpHeaders().toSingleValueMap())

@@ -104,16 +104,17 @@ class StubSpec extends Specification {
     @Unroll
     def 'GET /numbers?order=#order should return condition matched response'() {
         when:
-        def response = restTemplate.getForEntity("/numbers?order=$order", List)
+        def response = restTemplate.getForEntity("/numbers${order ? "?order=$order" : ''}", Object)
 
         then:
-        response.statusCode == HttpStatus.OK
+        response.statusCode == status
         response.body == body
 
         where:
-        order   | body
-        'asc'   | [1, 2, 3]
-        'desc'  | [3, 2, 1]
+        order  | body                           | status
+        'asc'  | [1, 2, 3]                      | HttpStatus.OK
+        'desc' | [3, 2, 1]                      | HttpStatus.OK
+        null   | ['error': 'require_parameter'] | HttpStatus.BAD_REQUEST
     }
 
     def 'GET /users/2/photo should return an image'() {
