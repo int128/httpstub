@@ -1,6 +1,7 @@
 - response:
     headers:
-      content-type: "application/json;charset=${params.charset ?: 'UTF-8'}"
+      content-type:
+        - "application/json;charset=${params.charset ?: 'UTF-8'}"
     body:
       - id: 1
         name: あいうえお

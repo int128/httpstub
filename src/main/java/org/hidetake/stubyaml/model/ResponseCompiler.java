@@ -27,7 +27,8 @@ public class ResponseCompiler {
 
         return CompiledResponse.builder()
             .status(response.getStatus())
-            .headers(mapValue(response.getHeaders(), value -> expressionCompiler.compileTemplate(value, source)))
+            .headers(mapValue(response.getHeaders(),
+                value -> value.stream().map(v -> expressionCompiler.compileTemplate(v, source)).collect(toList())))
             .body(compileBody(response, source))
             .tables(tableCompiler.compile(response.getTables(), source))
             .delay(computeDelay(response, source))

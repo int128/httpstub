@@ -1,7 +1,8 @@
 - response:
     delay: 500
     headers:
-      content-type: application/json
+      content-type:
+        - application/json
     body:
       id: ${UUID.randomUUID()}
       filename: ${body.file.filename()}

@@ -1,6 +1,7 @@
 - response:
     headers:
-      content-type: text/plain
+      content-type:
+        - text/plain
     body: |-
       ${switch (body) {
         case null: return 'null'

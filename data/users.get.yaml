@@ -1,7 +1,12 @@
 - response:
     headers:
-      content-type: application/json
-      x-uuid: ${UUID.randomUUID()}
+      content-type:
+        - application/json
+      x-uuid:
+        - ${UUID.randomUUID()}
+      set-cookie:
+        - hoge=A
+        - fuga=B
     body:
       - id: 1
         name: Foo

@@ -39,7 +39,8 @@ public class ResponseRenderer {
 
     private Mono<ServerResponse> renderInternal(CompiledResponse compiledResponse, ResponseContext responseContext) {
         final var headers = new HttpHeaders();
-        headers.setAll(compiledResponse.evaluateHeaders(responseContext));
+        compiledResponse.evaluateHeaders(responseContext)
+            .forEach((headerName, headerValues) -> headerValues.forEach(header -> headers.add(headerName, header)));
 
         final var responseBuilder = ServerResponse
             .status(compiledResponse.getHttpStatus())

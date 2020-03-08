@@ -1,4 +1,5 @@
 - response:
     headers:
-      content-type: "text/plain;charset=${params.charset ?: 'UTF-8'}"
+      content-type:
+        - "text/plain;charset=${params.charset ?: 'UTF-8'}"
     body: ${body}

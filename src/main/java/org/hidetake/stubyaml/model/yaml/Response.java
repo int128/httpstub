@@ -9,7 +9,7 @@ import java.util.Map;
 @Data
 public class Response {
     private int status = 200;
-    private Map<String, String> headers = Collections.emptyMap();
+    private Map<String, List<String>> headers = Collections.emptyMap();
 
     /**
      * Response body.
