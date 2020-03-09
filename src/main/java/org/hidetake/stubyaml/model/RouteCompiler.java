@@ -33,15 +33,13 @@ public class RouteCompiler {
     public Optional<CompiledRoute> compile(RouteSource routeSource, File baseDirectory) {
         return routeSource.parseName(baseDirectory.toPath())
             .flatMap(route -> {
-                switch (route.getType()) {
-                    case YAML:
-                        return Optional.of(CompiledRoute.builder()
-                            .requestPredicate(requestPredicate(routeSource, route))
-                            .rules(compileYaml(routeSource))
-                            .build());
-                    default:
-                        return Optional.empty();
+                if (route.getType() == Route.RouteType.YAML) {
+                    return Optional.of(CompiledRoute.builder()
+                        .requestPredicate(requestPredicate(routeSource, route))
+                        .rules(compileYaml(routeSource))
+                        .build());
                 }
+                return Optional.empty();
             });
     }
 

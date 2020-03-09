@@ -34,7 +34,7 @@ public class ResponseCompiler {
             .build();
     }
 
-    private CompiledResponseBody compileBody(Response response, RouteSource source) {
+    private CompiledResponseBody<?> compileBody(Response response, RouteSource source) {
         final var body = response.getBody();
         final var file = response.getFile();
         if (body != null && file != null) {

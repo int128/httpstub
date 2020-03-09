@@ -27,5 +27,5 @@ public class RequestContext implements Bindable {
         binding.setVariable("body", requestBody);
         binding.setVariable("constants", constants);
         return binding;
-    };
+    }
 }
