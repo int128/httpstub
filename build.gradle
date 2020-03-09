@@ -12,18 +12,18 @@ repositories {
 }
 
 dependencies {
-  compile 'org.yaml:snakeyaml'
-  compile 'org.springframework.boot:spring-boot-starter-webflux'
-  compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  compile 'org.codehaus.groovy:groovy-all'
+  implementation 'org.yaml:snakeyaml'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+  implementation 'org.codehaus.groovy:groovy-all'
 
   compileOnly 'org.projectlombok:lombok:1.18.10'
   annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
-  testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
-  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
-  testCompile 'org.springframework.boot:spring-boot-starter-test'
-  testRuntime 'cglib:cglib-nodep:3.2.7'
-  testRuntime 'org.objenesis:objenesis:2.6'
-  testRuntime 'org.apache.httpcomponents:httpclient'
+  testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+  testImplementation 'org.spockframework:spock-spring:1.1-groovy-2.4'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testRuntimeOnly 'cglib:cglib-nodep:3.2.7'
+  testRuntimeOnly 'org.objenesis:objenesis:2.6'
+  testRuntimeOnly 'org.apache.httpcomponents:httpclient'
 }
