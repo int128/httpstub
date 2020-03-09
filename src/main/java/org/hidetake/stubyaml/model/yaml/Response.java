@@ -9,7 +9,12 @@ import java.util.Map;
 @Data
 public class Response {
     private int status = 200;
-    private Map<String, String> headers = Collections.emptyMap();
+
+    /**
+     * Response header.
+     * The value must be one of {@link String} or {@link List}.
+     */
+    private Map<String, Object> headers = Collections.emptyMap();
 
     /**
      * Response body.
