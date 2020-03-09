@@ -123,9 +123,37 @@ Following methods are supported.
 - TRACE
 
 
-### Content type
+### Path variables
 
-Set the content type header as follows:
+A braced string in the file path is treated as a path variable.
+For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
+
+
+### Response header
+
+You can set pairs of key and value to the headers. The value must be a string and is parsed as a template (see also the later section).
+
+```yaml
+- response:
+    headers:
+      content-type: text/plain
+      x-uuid: "1234567890"
+```
+
+You can set multiple values.
+
+```yaml
+- response:
+    headers:
+      set-cookie:
+        - sessionId=38afes7a8
+        - id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT
+```
+
+
+### Response body
+
+You can serve a text body as follows:
 
 ```yaml
 - response:
@@ -141,53 +169,33 @@ Set the content type header as follows:
       </users>
 ```
 
-Set the character set for response body if needed:
-
-```yaml
-- response:
-    headers:
-      content-type: text/plain;charset=Shift_JIS
-    body: Example
-```
-
-
-### Response file
-
-You can specify a `file` instead of `body` as follows:
-
-```yaml
-- response:
-    headers:
-      content-type: image/jpeg
-    file: photo.jpg
-```
-
-
-### Path variables
-
-A braced string in the file path is treated as a path variable.
-For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/2` and so on.
-
-
-### Constants
-
-Define constants in `data/config.yaml`:
-
-```yaml
-constants:
-  today: "2017-12-01"
-```
-
-You can use constants in a route YAML:
+You can serve a JSON body as follows:
 
 ```yaml
 - response:
     headers:
       content-type: application/json
     body:
-      - id: 1
-        name: Foo
-        registeredDate: ${constants.today}
+      id: 1
+      name: Alice
+```
+
+If a character set is specified in the `content-type` header, the response body is encoded to the character set.
+
+```yaml
+- response:
+    headers:
+      content-type: text/plain;charset=Shift_JIS
+    body: あいうえお
+```
+
+You can serve a file content as follows:
+
+```yaml
+- response:
+    headers:
+      content-type: image/jpeg
+    file: photo.jpg
 ```
 
 
@@ -227,7 +235,7 @@ For example, create `/users/{userId}.get.yaml` as following:
     headers:
       content-type: application/json
     body:
-      id: ${path.userId},
+      id: ${path.userId}
       name: User${path.userId}
 ```
 
@@ -275,6 +283,28 @@ And on the request `GET /numbers?order=desc`:
 ```
 
 If the last resort is not defined, the stub will return 404.
+
+
+### Constants
+
+Define constants in `data/config.yaml`:
+
+```yaml
+constants:
+  today: "2017-12-01"
+```
+
+You can use constants in a route YAML:
+
+```yaml
+- response:
+    headers:
+      content-type: application/json
+    body:
+      - id: 1
+        name: Foo
+        registeredDate: ${constants.today}
+```
 
 
 ### Tables
