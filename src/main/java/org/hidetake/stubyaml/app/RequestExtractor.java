@@ -73,11 +73,11 @@ public class RequestExtractor {
                 return extractBodyAsString(request)
                     .doOnSuccess(string -> requestResponseLogger.logRequest(request, string));
             } else {
-                return extractBodyAsBytes(request)
+                return extractBodyAsBytes()
                     .doOnSuccess(x -> requestResponseLogger.logRequest(request, "[body]"));
             }
         }).orElseGet(() ->
-            extractBodyAsBytes(request)
+            extractBodyAsBytes()
                 .doOnSuccess(x -> requestResponseLogger.logRequest(request, (String) null)));
     }
 
@@ -85,7 +85,7 @@ public class RequestExtractor {
         return request.bodyToMono(String.class);
     }
 
-    private Mono<Void> extractBodyAsBytes(ServerRequest request) {
+    private Mono<Void> extractBodyAsBytes() {
         // TODO: provide bytes to script
         return Mono.empty();
     }

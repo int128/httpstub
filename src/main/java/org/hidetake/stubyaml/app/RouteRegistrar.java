@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.all;
@@ -57,11 +58,8 @@ public class RouteRegistrar {
             .map(path -> new RouteSource(path.toFile()))
             .flatMap(routeSource -> {
                 try {
-                    return routeCompiler.compile(routeSource, baseDirectory)
-                        .map(compiledRoute -> Stream.of(RouterFunctions.route(
-                            compiledRoute.getRequestPredicate(),
-                            routeHandler.proxy(compiledRoute))))
-                        .orElse(Stream.empty());
+                    return routeCompiler.compile(routeSource, baseDirectory).stream().map(compiledRoute ->
+                        RouterFunctions.route(compiledRoute.getRequestPredicate(), routeHandler.proxy(compiledRoute)));
                 } catch (Exception e) {
                     exceptions.add(e);
                     return Stream.empty();
@@ -75,9 +73,9 @@ public class RouteRegistrar {
         final var status = String.format(
             "## %d ERROR(S)\n\n%s\n\n## %d ROUTE(S)\n\n%s",
             exceptions.size(),
-            String.join("\n----\n", exceptions.stream().map(Throwable::toString).collect(toList())),
+            exceptions.stream().map(Throwable::toString).collect(joining("\n----\n")),
             functions.size(),
-            String.join("\n", functions.stream().map(RouterFunction::toString).collect(toList())));
+            functions.stream().map(RouterFunction::toString).collect(joining("\n")));
         return RouterFunctions.route(GET("/"), request -> ok().syncBody(status));
     }
 

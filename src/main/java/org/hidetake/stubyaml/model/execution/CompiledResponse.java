@@ -15,7 +15,7 @@ import static org.springframework.util.ObjectUtils.nullSafeToString;
 public class CompiledResponse {
     private final int status;
     private final Map<String, CompiledExpression> headers;
-    private final CompiledResponseBody body;
+    private final CompiledResponseBody<?> body;
     private final CompiledTables tables;
     private final Duration delay;
 

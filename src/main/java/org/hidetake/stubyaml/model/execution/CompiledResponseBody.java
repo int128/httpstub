@@ -13,7 +13,7 @@ import static org.springframework.util.ObjectUtils.nullSafeToString;
 public interface CompiledResponseBody<T> {
     T evaluate(ResponseContext responseContext);
 
-    class NullBody implements CompiledResponseBody {
+    class NullBody implements CompiledResponseBody<Object> {
         @Override
         public Object evaluate(ResponseContext responseContext) {
             return null;
@@ -21,7 +21,7 @@ public interface CompiledResponseBody<T> {
     }
 
     @RequiredArgsConstructor
-    class PrimitiveBody implements CompiledResponseBody {
+    class PrimitiveBody implements CompiledResponseBody<Object> {
         private final Object body;
 
         @Override
