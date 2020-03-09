@@ -1,11 +1,14 @@
 package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
+import org.hidetake.stubyaml.model.execution.CompiledExpression;
 import org.hidetake.stubyaml.model.execution.CompiledResponse;
 import org.hidetake.stubyaml.model.execution.CompiledResponseBody;
 import org.hidetake.stubyaml.model.yaml.Response;
 import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,11 +30,36 @@ public class ResponseCompiler {
 
         return CompiledResponse.builder()
             .status(response.getStatus())
-            .headers(mapValue(response.getHeaders(), value -> expressionCompiler.compileTemplate(value, source)))
+            .headers(compileHeaders(response.getHeaders(), source))
             .body(compileBody(response, source))
             .tables(tableCompiler.compile(response.getTables(), source))
             .delay(computeDelay(response, source))
             .build();
+    }
+
+    private MultiValueMap<String, CompiledExpression> compileHeaders(Map<String, Object> headers, RouteSource source) {
+        final var target = new LinkedMultiValueMap<String, CompiledExpression>(headers.size());
+        headers.forEach((key, value) -> {
+            if (value instanceof List<?>) {
+                target.addAll(key, compileHeaderValues((List<?>) value, source));
+                return;
+            }
+            if (value instanceof String) {
+                target.add(key, expressionCompiler.compileTemplate((String) value, source));
+                return;
+            }
+            throw new IllegalRuleException("header value must be a string or list: " + value, source);
+        });
+        return target;
+    }
+
+    private List<CompiledExpression> compileHeaderValues(List<?> values, RouteSource source) {
+        return values.stream().map(value -> {
+            if (value instanceof String) {
+                return expressionCompiler.compileTemplate((String) value, source);
+            }
+            throw new IllegalRuleException("header value must be a string: " + value, source);
+        }).collect(toList());
     }
 
     private CompiledResponseBody<?> compileBody(Response response, RouteSource source) {

@@ -2,6 +2,9 @@
     headers:
       content-type: application/json
       x-uuid: ${UUID.randomUUID()}
+      x-uid:
+        - "10000"
+        - "20000"
     body:
       - id: 1
         name: Foo

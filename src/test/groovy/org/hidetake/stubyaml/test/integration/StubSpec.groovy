@@ -24,6 +24,7 @@ class StubSpec extends Specification {
         users.body[0] == new User(1, 'Foo')
         users.body[1] == new User(2, 'Bar')
         !users.headers.getFirst('x-uuid').empty
+        users.headers.get('x-uid') == ['10000', '20000']
     }
 
     @Unroll
