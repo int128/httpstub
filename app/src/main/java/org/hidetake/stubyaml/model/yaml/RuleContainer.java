@@ -3,7 +3,8 @@ package org.hidetake.stubyaml.model.yaml;
 import lombok.*;
 
 import java.util.List;
-import java.util.Objects;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 @Data
 @Builder
@@ -18,35 +19,20 @@ public class RuleContainer {
         return Version.of(version);
     }
 
-    public enum Version {
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class WithOneRule {
 
-        V10,    //1.0 - rules list
-        V11,    //1.1 - rules replaced with container
-        LATEST(V11)  //1.1
-        ;
+        public Rule rules;
+        private String version;
 
-        private final Version link;
-
-        Version(Version link) {
-            this.link = link;
-        }
-
-        Version() {
-            this.link = null;
-        }
-
-        public static Version of(String text){
-            Version version;
-            try {
-                String localText = text.replaceAll("[^A-z0-9]+", "")
-                    .replaceAll("^[^Vv]+", "V")
-                    .toUpperCase();
-                version = Version.valueOf(localText);
-            } catch (IllegalArgumentException e) {
-                version = LATEST;
-            }
-
-            return Objects.nonNull(version.link) ? version.link : version;
+        public RuleContainer toContainer() {
+            return RuleContainer.builder()
+                .rules(newArrayList(rules))
+                .version(version)
+                .build();
         }
 
     }

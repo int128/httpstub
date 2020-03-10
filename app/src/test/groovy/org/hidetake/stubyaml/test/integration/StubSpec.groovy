@@ -220,4 +220,16 @@ class StubSpec extends Specification {
         ['application/json'] in response.headers.values()
     }
 
+    def 'GET /response-with-one-rule should return normal response with wrong yaml declaration'() {
+        when:
+        def response = restTemplate.getForEntity('/features/response-with-one-rule', Map)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 1
+        response.body == ['code': 'misprint feature']
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+    }
+
 }

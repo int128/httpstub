@@ -3,7 +3,7 @@ buildscript {
   ext {
     springBootVersion = '2.2.4.RELEASE'
     guavaVersion = '28.1-jre'
-    groovyVersion = '3.0.1'
+    groovyVersion = '2.5.9'
   }
 
   repositories {
