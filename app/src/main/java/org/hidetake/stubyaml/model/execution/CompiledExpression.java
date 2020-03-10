@@ -14,9 +14,9 @@ public class CompiledExpression {
 
     @SneakyThrows
     public Object evaluate(Bindable bindable) {
-        Object output = null;
+        Object output;
         try {
-            final var script = clazz.newInstance();
+            final var script = clazz.getConstructor().newInstance();
             Binding binding = new Binding(bindable.getBinding());
             script.setBinding(binding);
             output = script.run();

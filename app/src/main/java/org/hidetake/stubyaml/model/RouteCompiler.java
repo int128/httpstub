@@ -2,6 +2,7 @@ package org.hidetake.stubyaml.model;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.hidetake.stubyaml.model.exception.IllegalRouteException;
 import org.hidetake.stubyaml.model.execution.CompiledRoute;
 import org.hidetake.stubyaml.model.execution.CompiledRule;
 import org.hidetake.stubyaml.model.yaml.Route;
@@ -32,7 +33,7 @@ public class RouteCompiler implements ObjectCompiler {
                 if (Route.RouteType.YAML == route.getType()) {
                     return Optional.of(CompiledRoute.builder()
                         .requestPredicate(requestPredicate(routeSource, route))
-                        .rules(compileYaml(routeSource))
+                        .rules(compileRules(routeSource))
                         .build());
                 }
                 return Optional.empty();
@@ -44,11 +45,13 @@ public class RouteCompiler implements ObjectCompiler {
     }
 
     @SneakyThrows
-    private RequestPredicate createRequestPredicate(Route route) {
-        final var httpMethod = HttpMethod.valueOf(route.getMethod().toUpperCase());
-
-        return method(httpMethod)
-            .and(path(route.getRequestPath()));
+    private RequestPredicate requestPredicate(RouteSource routeSource, Route route) {
+        final var httpMethodName = route.getMethod().toUpperCase();
+        try {
+            return method(HttpMethod.valueOf(httpMethodName)).and(path(route.getRequestPath()));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalRouteException(routeSource, "Ignored invalid HTTP method: " + httpMethodName);
+        }
     }
 
 }

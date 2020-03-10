@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.all;
@@ -77,10 +76,11 @@ public class RouteRegistrar {
         return routeSource -> {
             try {
                 return routeCompiler.compile(routeSource, baseDirectory)
-                    .map(compiledRoute -> Stream.of(
-                        RouterFunctions.route(
+                    .map(compiledRoute ->
+                        Stream.of(RouterFunctions.route(
                             compiledRoute.getRequestPredicate(),
-                            routeHandler.proxy(compiledRoute))));
+                            routeHandler.proxy(compiledRoute))))
+                    .orElse(Stream.empty());
             } catch (Exception e) {
                 exceptions.add(e);
                 return Stream.empty();
