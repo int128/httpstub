@@ -21,9 +21,9 @@ dependencies {
   testImplementation "org.spockframework:spock-spring:$spockVersion"
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-  testRuntime 'cglib:cglib-nodep:3.2.7'
-  testRuntime 'org.objenesis:objenesis:2.6'
-  testRuntime 'org.apache.httpcomponents:httpclient'
+  testRuntimeOnly 'cglib:cglib-nodep:3.2.7'
+  testRuntimeOnly 'org.objenesis:objenesis:2.6'
+  testRuntimeOnly 'org.apache.httpcomponents:httpclient'
 }
 
 publishing {

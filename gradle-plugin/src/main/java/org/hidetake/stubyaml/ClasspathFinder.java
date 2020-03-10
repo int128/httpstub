@@ -2,6 +2,7 @@ package org.hidetake.stubyaml;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
@@ -15,10 +16,12 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ClasspathFinder {
 
-    public static final String JAR_PACKAGE = "org/hidetake/stubyaml";
+    public static final String JAR_PACKAGE_MAVEN = "org/hidetake/stubyaml";
+    public static final String JAR_PACKAGE_GRADLE = "org.hidetake.stubyaml";
     public static final String JAR_NAME = "app";
     public static final String JAVA_CONFIGURATION = "classpath";
 
@@ -33,11 +36,13 @@ public class ClasspathFinder {
         }
 
         List<URL> urls = classpath.stream()
-            .filter(url -> url.getFile().contains(JAR_PACKAGE))
+            .filter(url -> url.getFile().contains(JAR_PACKAGE_MAVEN) ||
+                url.getFile().contains(JAR_PACKAGE_GRADLE))
             .filter(url -> url.getFile().contains(JAR_NAME))
             .collect(Collectors.toList());
 
         if(CollectionUtils.isEmpty(urls)) {
+            log.error("Unable to find jar in next classpath: {}", classpath);
             throw new GradleException("Please add httpstub.jar into buildscript closure");
         } else if(urls.size() > 1) {
             throw new GradleException(String.format("Found to many jars in classpath, please remove unnecessary jars, jars: %s", urls));
