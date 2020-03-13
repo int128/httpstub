@@ -1,14 +1,16 @@
 package org.hidetake.stubyaml.service.rules;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hidetake.stubyaml.model.yaml.RouteSource;
+import org.hidetake.stubyaml.model.exception.StubyamlException;
 import org.hidetake.stubyaml.model.yaml.Rule;
 import org.hidetake.stubyaml.model.yaml.RuleContainer;
 import org.hidetake.stubyaml.model.yaml.Version;
 import org.hidetake.stubyaml.service.YamlParser;
 import org.yaml.snakeyaml.constructor.ConstructorException;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.Objects;
 
 @Slf4j
 public abstract class RulesV11Compiler extends RulesV10Compiler {
@@ -18,33 +20,36 @@ public abstract class RulesV11Compiler extends RulesV10Compiler {
     }
 
     @Override
-    public Object compile(RouteSource routeSource) {
+    public Object compile(File file) {
         RuleContainer container;
         try {
-            container = yamlParser.parse(routeSource.getFile(), RuleContainer.class);
+            container = yamlParser.parse(file, RuleContainer.class);
         } catch (ConstructorException skip) {
             try {
-                container = yamlParser.parse(routeSource.getFile(), RuleContainer.WithOneRule.class)
+                container = yamlParser.parse(file, RuleContainer.WithOneRule.class)
                     .toContainer();
             } catch (ConstructorException skip2) {
-                container = oldCompilation(routeSource, skip);
+                container = oldCompilation(file, skip);
             }
+        }
+
+        if(Objects.isNull(container)) {
+            throw StubyamlException.of("Container can't be null, file=%s", file.getPath());
         }
 
         return container;
     }
 
-    private RuleContainer oldCompilation(RouteSource routeSource, ConstructorException skip) {
+    private RuleContainer oldCompilation(File file, ConstructorException skip) {
         RuleContainer container;
-        Rule[] rules = (Rule[]) super.compile(routeSource);
+        Rule[] rules = (Rule[]) super.compile(file);
         try {
             container = RuleContainer.builder()
                 .rules(Arrays.asList(rules))
                 .version(Version.V10.name())
                 .build();
         } catch (Exception e) {
-            log.error("ERROR: ", skip);
-            throw e;
+            throw skip;
         }
 
         return container;

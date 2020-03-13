@@ -1,10 +1,9 @@
 package org.hidetake.stubyaml.util;
 
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,4 +25,9 @@ public class MapUtils {
         source.forEach((key, value) -> target.put(key, value.stream().map(transform).collect(Collectors.toList())));
         return target;
     }
+
+    public static boolean isEmpty(Map map) {
+        return map == null || map.size() == 0;
+    }
+
 }

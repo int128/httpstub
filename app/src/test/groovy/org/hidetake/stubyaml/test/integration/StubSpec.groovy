@@ -232,4 +232,48 @@ class StubSpec extends Specification {
         ['application/json'] in response.headers.values()
     }
 
+    @Unroll
+    def 'GET /api/account/#id should be registered from file'() {
+        when:
+        def response = restTemplate.getForEntity("/api/account/$id", Map)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 2
+        response.body == ['id': id, 'name': "account$id"]
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+
+        where:
+        id << ['1', '2']
+    }
+
+    @Unroll
+    def 'GET /custom-mapping/api/account/#id should be registered from file'() {
+        when:
+        def response = restTemplate.getForEntity("/custom-mapping/api/account/$id", Map)
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 2
+        response.body == ['id': id, 'name': "account$id"]
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+
+        where:
+        id << ['1', '2']
+    }
+
+    def 'GET /api/accounts should be registered without method'() {
+        when:
+        def response = restTemplate.getForEntity('/api/accounts', Map[])
+
+        then:
+        response.statusCode == HttpStatus.OK
+        response.body.size() == 2
+        response.body == [['name': 'account1'], ['name': 'account2']]
+        response.headers.size() == 2
+        ['application/json'] in response.headers.values()
+    }
+
 }

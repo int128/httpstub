@@ -20,4 +20,14 @@ public class StringUtils {
         return object == null ? "" : object.toString();
     }
 
+    public static String firstNonEmpty(String... strings) {
+        for (String string : strings) {
+            if(!isEmpty(string)) {
+                return string;
+            }
+        }
+
+        throw new NullPointerException("All given objects are empty");
+    }
+
 }

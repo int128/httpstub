@@ -17,7 +17,7 @@ public class ReloadableRouter implements RouterFunction<ServerResponse> {
             all(), request -> status(INTERNAL_SERVER_ERROR).syncBody("Initializing..."));
 
     public void reload(RouterFunction<ServerResponse> routerFunction) {
-        log.info("Reloading router function... {} -> {}", current, routerFunction);
+        log.info("Reloading router function");
         current = routerFunction;
     }
 

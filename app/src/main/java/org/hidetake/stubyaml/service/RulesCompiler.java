@@ -20,7 +20,7 @@ public class RulesCompiler {
     private final RuleCompiler ruleCompiler;
 
     public List<CompiledRule> compile(RouteSource routeSource) {
-        RuleContainer ruleContainer = compositeRulesCompiler.compile(routeSource);
+        RuleContainer ruleContainer = compositeRulesCompiler.compile(routeSource.getFile());
         List<CompiledRule> output = ruleContainer.getRules().stream()
             .map(rule -> ruleCompiler.compile(routeSource, rule))
             .collect(toList());

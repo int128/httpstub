@@ -1,9 +1,9 @@
 package org.hidetake.stubyaml.service.rules;
 
-import org.hidetake.stubyaml.model.yaml.RouteSource;
+import java.io.File;
 
 public interface VersionCompiler {
 
-    Object compile(RouteSource routeSource);
+    Object compile(File file);
 
 }

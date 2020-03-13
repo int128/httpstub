@@ -7,6 +7,7 @@ public class Rule {
 
     //TODO: refactor to collection of conditions
     private String when;
+    private Request request;
     private Response response;
 
 }

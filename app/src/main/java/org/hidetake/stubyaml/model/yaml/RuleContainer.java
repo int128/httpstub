@@ -2,6 +2,7 @@ package org.hidetake.stubyaml.model.yaml;
 
 import lombok.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -35,6 +36,13 @@ public class RuleContainer {
                 .build();
         }
 
+    }
+
+    public static RuleContainer empty(){
+        return RuleContainer.builder()
+            .rules(Collections.emptyList())
+            .version(Version.LATEST.name())
+            .build();
     }
 
 }

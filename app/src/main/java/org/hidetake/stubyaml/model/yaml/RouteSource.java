@@ -2,14 +2,13 @@ package org.hidetake.stubyaml.model.yaml;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public interface RouteSource {
 
     File getFile();
 
-    String getName();
+    Route parse(String relativePath);
 
-    Optional<Route> parseName(Path basePath);
+    String computeRelativePath(File file, Path basePath);
 
 }

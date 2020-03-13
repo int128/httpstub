@@ -1,9 +1,10 @@
 buildscript {
 
   ext {
-    springBootVersion = '2.2.4.RELEASE'
+    springBootVersion = '2.2.5.RELEASE'
     guavaVersion = '28.1-jre'
     groovyVersion = '2.5.9'
+    lombokVersion = '1.18.10'
   }
 
   repositories {
@@ -46,8 +47,8 @@ subprojects {
   }
 
   dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.10'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion" 
     annotationProcessor('com.github.bsideup.jabel:jabel-javac-plugin:0.2.0') {
       exclude group: 'net.bytebuddy', module: 'byte-buddy'
       exclude group: 'net.bytebuddy', module: 'byte-buddy-agent'

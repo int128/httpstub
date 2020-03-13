@@ -8,6 +8,7 @@ import org.hidetake.stubyaml.model.execution.CompiledRule;
 import org.hidetake.stubyaml.model.yaml.Route;
 import org.hidetake.stubyaml.model.yaml.RouteSource;
 import org.hidetake.stubyaml.service.ObjectCompiler;
+import org.hidetake.stubyaml.service.RouteSourceParser;
 import org.hidetake.stubyaml.service.RulesCompiler;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -25,18 +26,23 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 public class RouteCompiler implements ObjectCompiler {
 
     private final RulesCompiler rulesCompiler;
+    private final RouteSourceParser routeSourceParser;
+
 
     //TODO: #JSON_TAG add json support
     public Optional<CompiledRoute> compile(RouteSource routeSource, File baseDirectory) {
-        return routeSource.parseName(baseDirectory.toPath())
+        return routeSourceParser.convertToRoute(routeSource, baseDirectory.toPath())
             .flatMap(route -> {
-                if (Route.RouteType.YAML == route.getType()) {
-                    return Optional.of(CompiledRoute.builder()
-                        .requestPredicate(requestPredicate(routeSource, route))
-                        .rules(compileRules(routeSource))
-                        .build());
+                switch (route.getType()) {
+                    case YAML:
+                    case YML:
+                        return Optional.of(CompiledRoute.builder()
+                            .requestPredicate(requestPredicate(routeSource, route))
+                            .rules(compileRules(routeSource))
+                            .build());
+                    default:
+                        return Optional.empty();
                 }
-                return Optional.empty();
             });
     }
 

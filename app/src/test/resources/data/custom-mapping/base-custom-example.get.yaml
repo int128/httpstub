@@ -1,0 +1,13 @@
+version: v1.1
+rules:
+  - request:
+      path: /api/account/{accountId}
+      method: GET
+    response:
+      headers:
+        content-type: application/json
+      body: |
+        {
+          "id": "${path.accountId}",
+          "name": "account${path.accountId}"
+        }

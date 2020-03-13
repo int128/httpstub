@@ -14,7 +14,7 @@ Key features:
 ## Getting Started
 
 Download [the latest release](https://github.com/int128/httpstub/releases).
-Java 11 or later is required.
+Java 11 or later is required. 
 
 Define a route as follows:
 
@@ -151,20 +151,24 @@ For example, create `/users/{userId}.get.yaml` for handling `/users/1`, `/users/
 You can set pairs of key and value to the headers. The value must be a string and is parsed as a template (see also the later section).
 
 ```yaml
-- response:
-    headers:
-      content-type: text/plain
-      x-uuid: "1234567890"
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: text/plain
+        x-uuid: "1234567890"
 ```
 
 You can set multiple values.
 
 ```yaml
-- response:
-    headers:
-      set-cookie:
-        - sessionId=38afes7a8
-        - id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT
+version: v1.1
+rules:
+  - response:
+      headers:
+        set-cookie:
+          - sessionId=38afes7a8
+          - id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT
 ```
 
 
@@ -191,12 +195,14 @@ rules:
 You can serve a JSON body as follows:
 
 ```yaml
-- response:
-    headers:
-      content-type: application/json
-    body:
-      id: 1
-      name: Alice
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/json
+      body:
+        id: 1
+        name: Alice
 ```
 
 If a character set is specified in the `content-type` header, the response body is encoded to the character set.
@@ -221,6 +227,26 @@ rules:
       file: photo.jpg
 ```
 
+That means that you can store the larger response bodies in a separate file.
+
+```yaml
+version: v1.1
+rules:
+  - response:
+      headers:
+        content-type: application/json
+      file: big-file.json
+```
+
+```json
+#big-file.json
+{
+  "id": "123123",
+  "name": "Oliver",
+  ...
+  "account": "YU89RE00"
+}
+```
 
 ### Template
 
@@ -295,6 +321,12 @@ rules:
       headers:
         content-type: application/json
       body: [1, 2, 3]
+      
+  #default response should be at the end of the list
+  - response:                           
+      headers:
+        content-type: application/json
+      body: [0]
 ```
 
 The stub will return the following response on the request `GET /numbers?order=asc`:
@@ -307,6 +339,12 @@ And on the request `GET /numbers?order=desc`:
 
 ```json
 [3, 2, 1]
+```
+
+And on the request `GET /numbers`:
+
+```json
+[0]
 ```
 
 If the last resort is not defined, the stub will return 404.
@@ -416,7 +454,7 @@ Send the request `POST /users` and the stub will return a response after 500 ms.
 ## Gradle plugin
 
 You can connect this application as a gradle plugin to your's e2e tests or ci.   
-Configure your project as show below
+Configure your project as show below. The plugin is compatible with java 8 projects.
 
 ```groovy
 buildscript {
@@ -428,13 +466,37 @@ buildscript {
 apply plugin: 'org.hidetake.stubyaml'
 
 httpstub {
-	serverPort = '8078'  //port where httpstub will run
+	serverPort = '8078'                   //port where httpstub will run
 	stubData = 'src/test/resources/stubs' //folder where stored configs
 }
 ```
 
 `gradle httpstubStart` - to start stub server   
 `gradle httpstubStop` - to stop stub server
+
+## Custom path declaration
+
+You can specify the settings for stub in the yaml file. This feature overrides default folder logic.
+For example: if you create a file with the following path `/myfolder/subfolder` and set a customized path `/my/api`.
+Stub will be registered with overridden path `/my/api`. 
+Note: Request method from name with overridden path will be ignored.    
+
+```yaml
+# /myfolder/subfolder/users.get.yaml
+version: v1.1
+rules:
+  - request:
+      path: /my/api
+      method: POST     # Optional, could be empty. By default set GET 
+      relative: true   # Optional, could be empty. By default set to false
+    response:
+      headers:
+        content-type: application/json
+      body: 
+        id: 2
+        name: Jackie
+
+```
 
 ## Troubleshooting
 If you see in logs next exception `java.io.IOException: User limit of inotify watches reached` don't afraid
