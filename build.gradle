@@ -5,6 +5,12 @@ buildscript {
     guavaVersion = '28.1-jre'
     groovyVersion = '2.5.9'
     lombokVersion = '1.18.10'
+    artifactoryConf = [
+      url : System.getenv("ARTIFACTORY_URL") ?: "http://repo.myorg.com/artifactory/libs-releases",
+      username : System.getenv("ARTIFACTORY_USERNAME") ?: "resolver",
+      password : System.getenv("ARTIFACTORY_PASSWORD") ?: "resolverPaS*",
+      repo : System.getenv("ARTIFACTORY_REPOSITORY") ?: "libs-releases"
+    ]
   }
 
   repositories {
@@ -14,6 +20,7 @@ buildscript {
 
   dependencies {
     classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    classpath('org.jfrog.buildinfo:build-info-extractor-gradle:latest.release')
   }
 
 }
@@ -25,6 +32,7 @@ subprojects {
 
   apply plugin: 'java'
   apply plugin: 'maven-publish'
+  apply plugin: 'com.jfrog.artifactory'
 
   group = parent.group
   version = parent.version
@@ -61,6 +69,33 @@ subprojects {
   task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
+  }
+
+  if(project.name != 'app') {
+    publishing {
+      publications {
+        mavenJava(MavenPublication) {
+          from components.java
+          artifact (sourcesJar) {
+            classifier = 'sources'
+          }
+        }
+      }
+    }
+  }
+
+  artifactory {
+    publish {
+      contextUrl = artifactoryConf.url
+      repository {
+        repoKey = artifactoryConf.repo
+        username = artifactoryConf.username
+        password = artifactoryConf.password
+      }
+      defaults {
+        publications('mavenJava')
+      }
+    }
   }
 
 }
