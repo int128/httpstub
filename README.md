@@ -59,6 +59,12 @@ curl -v http://localhost:8080/users
 
 The stub will reload YAML files if they have been changed or new one has been created.
 
+As well as you can run [the Docker image](https://hub.docker.com/repository/docker/int128/httpstub).
+
+```sh
+docker run -v $PWD/data:/app/data:ro -p 8080:8080 int128/httpstub
+```
+
 
 ## Options
 
