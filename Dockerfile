@@ -6,7 +6,7 @@ COPY gradle/ gradle/
 RUN ./gradlew --version
 
 COPY . .
-RUN ./gradlew build --no-daemon bootJar
+RUN ./gradlew build --no-daemon build
 
 FROM openjdk:11-jre-slim
 
