@@ -20,7 +20,7 @@ jobs:
           ~/.gradle/caches
           ~/.gradle/wrapper
         key: ${{ runner.os }}-gradlew-${{ hashFiles('**/*.gradle') }}
-        restore-keys: ${{ runner.os }}-gradle
+        restore-keys: ${{ runner.os }}-gradlew
     - run: ./gradlew --no-daemon build
     - uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1.6
       if: always()
