@@ -16,8 +16,10 @@ jobs:
         java-version: 11
     - uses: actions/cache@v2
       with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradlew-${{ hashFiles('**/*.gradle') }}
         restore-keys: ${{ runner.os }}-gradle
     - run: ./gradlew --no-daemon build
     - uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1.6
