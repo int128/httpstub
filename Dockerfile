@@ -1,18 +1,16 @@
-# Build App
-FROM openjdk:11-jdk-slim AS BUILD
+FROM openjdk:11-jdk-slim AS builder
 
-COPY *.gradle gradle.* gradlew /work/
-COPY gradle /work/gradle
-WORKDIR /work
+WORKDIR /builder/httpstub
+COPY *.gradle gradlew .
+COPY gradle/ gradle/
 RUN ./gradlew --version
 
-COPY . /work
-RUN ./gradlew build --build-file ./build.gradle
+COPY . .
+RUN ./gradlew build --no-daemon build
 
-# Run App
 FROM openjdk:11-jre-slim
 
-COPY --from=BUILD /work/build/libs/httpstub.jar /app/httpstub.jar
-EXPOSE 8080
 WORKDIR /app
+COPY --from=builder /builder/httpstub/build/libs/httpstub.jar .
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "httpstub.jar"]
