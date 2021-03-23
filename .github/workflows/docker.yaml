@@ -4,11 +4,23 @@ on:
   push:
     branches:
       - master
+    paths:
+      - .github/workflows/docker.yaml
+      - src/**
+      - gradle/**
+      - build.gradle
+      - Dockerfile
     tags:
       - v*
   pull_request:
     branches:
       - master
+    paths:
+      - .github/workflows/docker.yaml
+      - src/**
+      - gradle/**
+      - build.gradle
+      - Dockerfile
 
 jobs:
   build-push:
