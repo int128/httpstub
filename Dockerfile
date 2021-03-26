@@ -5,8 +5,8 @@ COPY *.gradle gradlew .
 COPY gradle/ gradle/
 RUN ./gradlew --version
 
-COPY . .
-RUN ./gradlew build --no-daemon build
+COPY src/ src/
+RUN ./gradlew build --no-daemon build -x test
 
 FROM openjdk:11-jre-slim
 
