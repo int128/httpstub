@@ -10,6 +10,7 @@ on:
       - gradle/**
       - build.gradle
       - Dockerfile
+      - Makefile
     tags:
       - v*
   pull_request:
@@ -21,6 +22,7 @@ on:
       - gradle/**
       - build.gradle
       - Dockerfile
+      - Makefile
 
 jobs:
   build-push:
