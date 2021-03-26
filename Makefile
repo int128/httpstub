@@ -1,10 +1,10 @@
 DOCKER_REPOSITORY := ghcr.io/int128/slack-docker
 
-# determine the version from ref
-ifeq ($(GITHUB_REF), refs/heads/master)
-  VERSION := latest
+# extract version from tag or default to latest
+ifeq ($(dir $(GITHUB_REF)), refs/tags/)
+  VERSION := $(notdir $(GITHUB_REF))
 else
-  VERSION ?= $(notdir $(GITHUB_REF))
+  VERSION := latest
 endif
 
 .PHONY: docker-build
@@ -19,7 +19,6 @@ docker-build: Dockerfile
 .PHONY: docker-build-push
 docker-build-push: Dockerfile
 	docker buildx build . \
-		--build-arg=VERSION=$(VERSION) \
 		--tag=$(DOCKER_REPOSITORY):$(VERSION) \
 		--cache-from=type=local,src=/tmp/buildx
 		--push
