@@ -12,7 +12,6 @@ docker-build: Dockerfile
 	docker buildx build . \
 		--output=type=image,push=false \
 		--cache-from=type=local,src=/tmp/buildx
-	rm -fr /tmp/buildx
 
 .PHONY: docker-build-push
 docker-build-push: Dockerfile
