@@ -41,4 +41,4 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: int128/buildx-push-action@main
+      - uses: int128/buildx-push-action@v1
