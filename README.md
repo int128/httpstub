@@ -1,4 +1,4 @@
-# httpstub [![CircleCI](https://circleci.com/gh/int128/httpstub.svg?style=shield)](https://circleci.com/gh/int128/httpstub) [![Gradle Status](https://gradleupdate.appspot.com/int128/httpstub/status.svg)](https://gradleupdate.appspot.com/int128/httpstub/status)
+# httpstub [![build](https://github.com/int128/httpstub/actions/workflows/build.yaml/badge.svg)](https://github.com/int128/httpstub/actions/workflows/build.yaml) [![Gradle Status](https://gradleupdate.appspot.com/int128/httpstub/status.svg)](https://gradleupdate.appspot.com/int128/httpstub/status)
 
 This is a HTTP stub server for integration test with external APIs.
 
