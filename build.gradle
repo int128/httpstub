@@ -17,8 +17,8 @@ dependencies {
   implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
   implementation 'org.codehaus.groovy:groovy-all:2.5.15'
 
-  compileOnly 'org.projectlombok:lombok:1.18.20'
-  annotationProcessor 'org.projectlombok:lombok:1.18.12'
+  compileOnly 'org.projectlombok:lombok:1.18.22'
+  annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
   testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
   testImplementation 'org.spockframework:spock-spring:1.3-groovy-2.5'
