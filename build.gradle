@@ -15,7 +15,7 @@ dependencies {
   implementation 'org.yaml:snakeyaml:1.30'
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
   implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-  implementation 'org.codehaus.groovy:groovy-all:2.5.16'
+  implementation 'org.codehaus.groovy:groovy-all:2.5.17'
 
   compileOnly 'org.projectlombok:lombok:1.18.24'
   annotationProcessor 'org.projectlombok:lombok:1.18.24'
