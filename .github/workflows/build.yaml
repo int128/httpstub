@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - run: ./gradlew --no-daemon build
 
-      - if: startswith(github.ref, 'refs/tags/')
-        run: gh release upload "${GITHUB_REF##*/}" build/libs/httpstub.jar --clobber
+      - if: github.ref_type == 'tag'
+        run: gh release upload '${{ github.ref_name }}' build/libs/httpstub.jar --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
