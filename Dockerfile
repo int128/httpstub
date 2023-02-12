@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim AS builder
+FROM openjdk:11.0.16-jdk-slim AS builder
 
 WORKDIR /builder/httpstub
 COPY *.gradle gradlew .
@@ -8,7 +8,7 @@ RUN ./gradlew --version
 COPY src/ src/
 RUN ./gradlew build --no-daemon build -x test
 
-FROM openjdk:11-jre-slim
+FROM openjdk:11.0.16-jre-slim
 
 WORKDIR /app
 COPY --from=builder /builder/httpstub/build/libs/httpstub.jar .
