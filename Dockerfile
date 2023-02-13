@@ -1,4 +1,4 @@
-FROM openjdk:11.0.16-jdk-slim AS builder
+FROM openjdk:17.0.2-jdk-slim AS builder
 
 WORKDIR /builder/httpstub
 COPY *.gradle gradlew .
